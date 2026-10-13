@@ -1,0 +1,159 @@
+{
+  "tabs": {
+    "home": "Home",
+    "history": "History",
+    "tasks": "Tasks",
+    "profile": "Profile"
+  },
+  "home": {
+    "title": "Home",
+    "greeting": "Hello, {{name}}",
+    "shift": "Today's shift",
+    "noShift": "No shift assigned",
+    "office": "Office",
+    "officeRadius": "{{name}}, within {{radius}} m",
+    "noOffice": "No office assigned. Ask your admin.",
+    "notCheckedIn": "Not checked in yet",
+    "checkedInAt": "Checked in at {{time}}",
+    "checkedOutAt": "Checked out at {{time}} · {{hours}}",
+    "checkIn": "Check in",
+    "checkOut": "Check out",
+    "loadFailed": "Couldn't load your details. Pull down to try again."
+  },
+  "history": {
+    "title": "History",
+    "placeholder": "Your check-ins by day and weekly hours arrive in Phase 4."
+  },
+  "tasks": {
+    "title": "My tasks",
+    "placeholder": "Your tasks and their status arrive in Phase 4."
+  },
+  "profile": {
+    "title": "Profile",
+    "placeholder": "Your details and ID card arrive in Phase 4."
+  },
+  "signIn": {
+    "title": "Sign in",
+    "subtitle": "Sign in to check in",
+    "roleEmployee": "Employee",
+    "roleAdmin": "Admin",
+    "mobile": "Mobile number",
+    "mobilePlaceholder": "10-digit mobile number",
+    "password": "Password",
+    "continue": "Continue",
+    "invalidInput": "Enter a valid 10-digit mobile number and your password.",
+    "employeeForgot": "Forgot your password? Ask your admin.",
+    "adminForgot": "Forgot password?",
+    "register": "Register your organisation",
+    "failed": "Invalid mobile number or password."
+  },
+  "server": {
+    "checking": "Checking the server…",
+    "connected": "Connected to the server",
+    "unreachable": "Can't reach the server",
+    "address": "Server: {{url}}"
+  },
+  "update": {
+    "title": "Update required",
+    "body": "This version of Mukham ({{current}}) is no longer supported. Please install version {{required}} or newer.",
+    "retry": "Check again"
+  },
+  "errors": {
+    "network": "Can't reach the server. Check your internet connection.",
+    "unknown": "Something went wrong. Please try again."
+  },
+  "app": {
+    "version": "Version {{version}}"
+  },
+  "consent": {
+    "title": "Your face data",
+    "p1": "We save one photo of your face to confirm it is you at sign-in and check-in.",
+    "p2": "It is stored privately and never shown to anyone.",
+    "p3": "It is deleted when you leave the organisation.",
+    "agree": "I agree",
+    "accept": "Accept and continue",
+    "back": "Back"
+  },
+  "face": {
+    "title": "Look at the camera",
+    "hint": "Hold the phone at eye level, in good light.",
+    "starting": "Starting the face check…",
+    "checking": "Checking it is really you…",
+    "enrolled": "Face saved",
+    "failed": "The face check didn't pass. Please try again.",
+    "expired": "Sign-in took too long. Please enter your password again.",
+    "retry": "Try again",
+    "startOver": "Start again",
+    "permissionTitle": "Camera access needed",
+    "permissionBody": "Mukham needs the camera for the live face check.",
+    "allowCamera": "Allow camera",
+    "openSettings": "Open settings",
+    "unavailableTitle": "Face check needs the Mukham app build",
+    "unavailableBody": "The live face check uses native code that Expo Go and the browser don't include. Install the Mukham development build on this phone to sign in as an employee. Admins can sign in here."
+  },
+  "register": {
+    "title": "Register your organisation",
+    "name": "Organisation name",
+    "mobile": "Admin mobile number",
+    "email": "Email (for password resets)",
+    "details": "Details (optional)",
+    "submit": "Register",
+    "invalidInput": "Enter the organisation name and a valid 10-digit mobile number.",
+    "doneTitle": "Organisation registered",
+    "doneBody": "Sign in as Admin with mobile number {{mobile}} and this password. Write it down now; it is shown only once.",
+    "toSignIn": "Go to sign in"
+  },
+  "forgot": {
+    "title": "Forgot password",
+    "body": "Enter your organisation's email. We'll send a link to set a new password.",
+    "email": "Email",
+    "submit": "Send link",
+    "invalidInput": "Enter a valid email address.",
+    "sent": "If an account uses this email, a reset link is on its way. Open it on any device to set a new password, then sign in here.",
+    "back": "Back to sign in"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "attendance": "Attendance",
+    "people": "People",
+    "setup": "Setup",
+    "dashboardPlaceholder": "Today's totals, charts and the department leaderboard arrive in Phase 5.",
+    "attendancePlaceholder": "Every employee's attendance and manual check-in arrive in Phase 5.",
+    "peoplePlaceholder": "Employees, the org chart and tasks arrive in Phase 6.",
+    "setupPlaceholder": "Departments, designations, shifts, office locations and the organisation profile arrive in Phase 7."
+  },
+  "account": {
+    "signOut": "Sign out",
+    "signedInAs": "Signed in as {{role}}",
+    "roleEmployee": "employee",
+    "roleAdmin": "admin"
+  },
+  "checkIn": {
+    "locating": "Finding your location…",
+    "faceTitle": "Look at the camera",
+    "starting": "Starting the face check…",
+    "verifying": "Checking it is really you…",
+    "saving": "Saving…",
+    "checkedInTitle": "Checked in at {{time}}",
+    "checkedOutTitle": "Checked out at {{time}}",
+    "distanceLine": "{{office}}, {{distance}} from the office",
+    "faceLine": "Live face check passed",
+    "hoursLine": "{{hours}} worked today",
+    "done": "Done",
+    "tryAgain": "Try again",
+    "cancel": "Cancel",
+    "outsideTitle": "Outside the office area",
+    "outsideBody": "You are {{distance}} from {{office}}. Move closer and try again.",
+    "faceFailedTitle": "The face check didn't pass",
+    "faceFailedBody": "Hold the phone at eye level, in good light, and try again.",
+    "noOpenTitle": "You're not checked in",
+    "locationTitle": "Location problem",
+    "permissionTitle": "Location access needed",
+    "permissionBody": "Mukham needs your location to confirm you're at the office.",
+    "permissionBlocked": "Location access is turned off for Mukham. Turn it on in Settings, then try again.",
+    "servicesOff": "Location is turned off on this phone. Turn it on and try again.",
+    "timeout": "Couldn't get a GPS fix. Move near a window or outside, then try again.",
+    "openSettings": "Open settings",
+    "failedTitle": "Couldn't check in"
+  }
+}
