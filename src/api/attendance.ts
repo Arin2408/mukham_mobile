@@ -13,6 +13,7 @@ export type EmployeeProfile = {
   first_name: string;
   last_name: string;
   mobile_number: string;
+  email: string | null;
   shift_name: string | null;
   shift_start_time: string | null; // "09:00:00"
   shift_end_time: string | null;
@@ -29,6 +30,14 @@ export type AttendanceRecord = {
   check_out: string | null;
   status: string;
   hours_worked: number | null;
+};
+
+/** One attendance record as History shows it. */
+export type HistoryRecord = AttendanceRecord & {
+  location_status: string;
+  face_status: string;
+  source: string;
+  check_in_distance: number | null;
 };
 
 export type MarkResult = {
@@ -49,6 +58,12 @@ export function getMyProfile() {
 export async function getLatestAttendance(): Promise<AttendanceRecord | null> {
   const records = await api<AttendanceRecord[]>('/attendance/history?limit=1');
   return records[0] ?? null;
+}
+
+/** The employee's own records between two dates (inclusive), newest first. */
+export function getAttendanceHistory(from: string, to: string) {
+  const query = new URLSearchParams({ from, to, limit: '1000' });
+  return api<HistoryRecord[]>(`/attendance/history?${query}`);
 }
 
 /**

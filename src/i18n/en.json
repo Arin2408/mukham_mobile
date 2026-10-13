@@ -22,15 +22,47 @@
   },
   "history": {
     "title": "History",
-    "placeholder": "Your check-ins by day and weekly hours arrive in Phase 4."
+    "thisWeek": "This week",
+    "week": "Week",
+    "month": "Month",
+    "quarter": "3 months",
+    "range_one": "{{from}} – {{to}} · {{count}} record",
+    "range_other": "{{from}} – {{to}} · {{count}} records",
+    "empty": "No check-ins in this period.",
+    "open": "Checked in",
+    "manual": "Added by admin"
   },
   "tasks": {
     "title": "My tasks",
-    "placeholder": "Your tasks and their status arrive in Phase 4."
+    "pending": "Pending",
+    "inProgress": "In progress",
+    "completed": "Completed",
+    "empty_pending": "No pending tasks.",
+    "empty_in_progress": "Nothing in progress.",
+    "empty_completed": "No completed tasks yet.",
+    "due": "Due {{date}}",
+    "noDue": "No due date",
+    "priority_low": "Low priority",
+    "priority_medium": "Medium priority",
+    "priority_high": "High priority",
+    "overdue": "Overdue",
+    "completedLate": "Completed late",
+    "detailTitle": "Task",
+    "assigned": "Assigned",
+    "dueLabel": "Due",
+    "completedOn": "Completed",
+    "status": "Status"
   },
   "profile": {
     "title": "Profile",
-    "placeholder": "Your details and ID card arrive in Phase 4."
+    "mobile": "Mobile number",
+    "email": "Email",
+    "department": "Department",
+    "designation": "Designation",
+    "shift": "Shift",
+    "office": "Office",
+    "notSet": "Not set",
+    "showIdCard": "Show ID card"
   },
   "signIn": {
     "title": "Sign in",
@@ -155,5 +187,19 @@
     "timeout": "Couldn't get a GPS fix. Move near a window or outside, then try again.",
     "openSettings": "Open settings",
     "failedTitle": "Couldn't check in"
+  },
+  "idCard": {
+    "title": "Employee ID",
+    "employeeId": "Employee ID",
+    "department": "Department",
+    "scan": "Scan to verify",
+    "close": "Close"
+  },
+  "states": {
+    "loading": "Loading",
+    "offlineTitle": "You're offline",
+    "offlineBody": "Check your internet connection and try again.",
+    "errorTitle": "Couldn't load this",
+    "retry": "Try again"
   }
 }

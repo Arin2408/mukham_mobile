@@ -71,7 +71,7 @@ const { PositionError } = jest.requireActual('@/features/location/get-position')
 const AT_OFFICE = { latitude: 28.614, longitude: 77.2091, accuracy: 12, mocked: false };
 
 async function renderScreen() {
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: Infinity } } });
   const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
   );

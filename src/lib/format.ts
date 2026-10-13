@@ -30,3 +30,72 @@ export function isToday(iso: string, now: Date = new Date()): boolean {
     date.getDate() === now.getDate()
   );
 }
+
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** "2026-10-13", the phone's local date, as the server's date filters expect. */
+export function toDateParam(date: Date): string {
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+/** A local Date from "2026-10-13" (not UTC midnight, which can be the day before). */
+export function parseDateParam(value: string): Date {
+  const [y, m, d] = value.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+/** "Tue, 13 Oct" for a date-time, in the phone's time zone. */
+export function formatDay(iso: string): string {
+  const date = new Date(iso);
+  return `${WEEKDAYS[date.getDay()]}, ${date.getDate()} ${MONTHS[date.getMonth()]}`;
+}
+
+/** "13 Oct 2026" for a date such as "2026-10-13". */
+export function formatDate(value: string): string {
+  const date = parseDateParam(value);
+  return `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+/** "Mon" … "Sun" for the weekly chart. */
+export const WEEK_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+/** Monday of the week that contains `date`, at midnight. */
+export function startOfWeek(date: Date): Date {
+  const monday = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+  return monday;
+}
+
+export type RangePreset = 'week' | 'month' | 'quarter';
+
+/** The dates History asks for: this week, this month, or the last 3 months. */
+export function rangeFor(preset: RangePreset, now: Date = new Date()): { from: string; to: string } {
+  const to = toDateParam(now);
+  if (preset === 'week') {
+    return { from: toDateParam(startOfWeek(now)), to };
+  }
+  const monthsBack = preset === 'month' ? 0 : 2;
+  return { from: toDateParam(new Date(now.getFullYear(), now.getMonth() - monthsBack, 1)), to };
+}
+
+/**
+ * Hours worked on each day Monday to Sunday of the week starting `monday`,
+ * by check-in day. Open records (still checked in) count as 0.
+ */
+export function hoursByWeekday(
+  records: { check_in: string; hours_worked: number | null }[],
+  monday: Date,
+): number[] {
+  const hours = [0, 0, 0, 0, 0, 0, 0];
+  const start = monday.getTime();
+  for (const record of records) {
+    const checkIn = new Date(record.check_in);
+    const day = new Date(checkIn.getFullYear(), checkIn.getMonth(), checkIn.getDate());
+    const index = Math.round((day.getTime() - start) / 86_400_000);
+    if (index >= 0 && index < 7) {
+      hours[index] += record.hours_worked ?? 0;
+    }
+  }
+  return hours;
+}
