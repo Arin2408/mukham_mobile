@@ -1,10 +1,11 @@
 import type { PermissionResponse } from 'expo-camera';
 import { useTranslation } from 'react-i18next';
-import { Linking, StyleSheet, Text } from 'react-native';
+import { Linking, Text } from 'react-native';
 
 import { Button } from '@/components/button';
 import { Screen } from '@/components/screen';
-import { text } from '@/theme';
+import { makeStyles } from '@/theme';
+
 
 type Props = {
   permission: PermissionResponse | null;
@@ -15,6 +16,7 @@ type Props = {
 
 /** Explains why the camera is needed, then asks (or links to Settings). */
 export function CameraPermissionRequest({ permission, requestPermission, onCancel, cancelLabel }: Props) {
+  const styles = useStyles();
   const { t } = useTranslation();
   const blocked = permission && !permission.canAskAgain;
 
@@ -30,9 +32,9 @@ export function CameraPermissionRequest({ permission, requestPermission, onCance
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ text }) => ({
   body: {
     ...text.body,
     lineHeight: 22,
   },
-});
+}));

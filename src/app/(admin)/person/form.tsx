@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { errorMessage } from '@/api/errors';
@@ -21,10 +21,11 @@ import { PickerField } from '@/components/picker-field';
 import { StateView } from '@/components/state-view';
 import { TextField } from '@/components/text-field';
 import { validateEmployee } from '@/features/people/validate';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 /** Add an employee (no id) or edit one (?id=). */
 export default function PersonFormScreen() {
+  const styles = useStyles();
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const editingId = id ? Number(id) : null;
@@ -60,6 +61,8 @@ export default function PersonFormScreen() {
 type FormProps = { existing?: Employee; employees: Employee[]; options: FormOptions };
 
 function EmployeeForm({ existing, employees, options }: FormProps) {
+  const styles = useStyles();
+  const { text } = useTheme();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<EmployeeInput>(() => ({
@@ -153,7 +156,7 @@ function EmployeeForm({ existing, employees, options }: FormProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -185,4 +188,4 @@ const styles = StyleSheet.create({
   mobileField: {
     flex: 1,
   },
-});
+}));

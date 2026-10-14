@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getOffices } from '@/api/setup';
@@ -9,10 +9,11 @@ import { Button } from '@/components/button';
 import { LinkRow } from '@/components/link-row';
 import { StateView } from '@/components/state-view';
 import { formatDistance } from '@/lib/format';
-import { colors, spacing } from '@/theme';
+import { makeStyles, spacing } from '@/theme';
 
 /** Office locations: where employees may check in. */
 export default function OfficesScreen() {
+  const styles = useStyles();
   const { t } = useTranslation();
   const offices = useQuery({ queryKey: ['admin', 'offices'], queryFn: getOffices });
 
@@ -45,7 +46,7 @@ export default function OfficesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -54,4 +55,4 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     gap: spacing.sm,
   },
-});
+}));

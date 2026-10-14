@@ -4,7 +4,7 @@ import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { colors, fonts } from '@/theme';
+import { fonts, useTheme } from '@/theme';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -15,6 +15,7 @@ function tabIcon(name: IconName) {
 }
 
 export default function TabLayout() {
+  const { colors } = useTheme();
   const { t } = useTranslation();
 
   return (

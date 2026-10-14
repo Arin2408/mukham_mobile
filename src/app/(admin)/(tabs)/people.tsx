@@ -1,27 +1,35 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Segmented } from '@/components/segmented';
+import { GradientText } from '@/components/ui/gradient-text';
+import { FadeIn } from '@/components/ui/motion';
 import { EmployeesView } from '@/features/people/employees-view';
 import { OrgChartView } from '@/features/people/org-chart-view';
 import { TasksView } from '@/features/people/tasks-view';
-import { colors, spacing, text } from '@/theme';
+import { makeStyles, spacing, useTheme } from '@/theme';
 
 type PeopleView = 'employees' | 'org' | 'tasks';
 
 /** People: employees, the org chart and tasks, one at a time. */
 export default function AdminPeopleScreen() {
+  const styles = useStyles();
+  const { text } = useTheme();
   const { t } = useTranslation();
   const [view, setView] = useState<PeopleView>('employees');
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
-        <Text style={[text.title, styles.title]} accessibilityRole="header">
-          {t('admin.people')}
-        </Text>
+        <FadeIn style={styles.titleRow}>
+          <View style={styles.titleText}>
+            <GradientText style={text.title} accessibilityRole="header">
+              {t('admin.people')}
+            </GradientText>
+          </View>
+        </FadeIn>
         <Segmented
           value={view}
           onChange={setView}
@@ -37,7 +45,7 @@ export default function AdminPeopleScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -47,7 +55,13 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.md,
     gap: spacing.md,
   },
-  title: {
+  titleRow: {
     marginTop: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
-});
+  titleText: {
+    flex: 1,
+  },
+}));

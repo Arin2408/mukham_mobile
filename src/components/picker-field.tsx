@@ -1,11 +1,11 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, Modal, Pressable, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { Option } from '@/api/people';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 type Props = {
   label: string;
@@ -18,6 +18,8 @@ type Props = {
 
 /** A form field that opens a searchable list of choices. */
 export function PickerField({ label, value, options, onChange, noneLabel }: Props) {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const current = options.find((o) => o.id === value);
@@ -63,6 +65,8 @@ type SheetProps = {
 
 /** A full-screen, searchable list of choices. */
 export function OptionSheet({ visible, title, options, value, noneLabel, onChoose, onClose }: SheetProps) {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const query = search.trim().toLowerCase();
@@ -122,7 +126,7 @@ export function OptionSheet({ visible, title, options, value, noneLabel, onChoos
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   field: {
     gap: spacing.xs,
   },
@@ -188,4 +192,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: spacing.lg,
   },
-});
+}));

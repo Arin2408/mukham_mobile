@@ -1,9 +1,10 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
-import { colors, fonts, radius, spacing } from '@/theme';
+import { fonts, makeStyles, radius, spacing } from '@/theme';
 
 /** A clear, red message shown above a form when something fails. */
 export function ErrorBanner({ message }: { message: string | null }) {
+  const styles = useStyles();
   if (!message) {
     return null;
   }
@@ -14,7 +15,7 @@ export function ErrorBanner({ message }: { message: string | null }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   banner: {
     backgroundColor: colors.dangerSoft,
     borderColor: colors.danger,
@@ -28,4 +29,4 @@ const styles = StyleSheet.create({
     color: colors.text,
     lineHeight: 20,
   },
-});
+}));

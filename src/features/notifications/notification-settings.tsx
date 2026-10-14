@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AppState, Linking, StyleSheet, Switch, Text, View } from 'react-native';
+import { AppState, Linking, Switch, Text, View } from 'react-native';
 
 import { ApiError, errorMessage } from '@/api/errors';
 import {
@@ -11,7 +11,7 @@ import {
 } from '@/api/notifications';
 import { Button } from '@/components/button';
 import { ErrorBanner } from '@/components/error-banner';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 import { askPushPermission, getPushPermission, registerForPush, type PushPermission } from './push';
 
@@ -29,6 +29,8 @@ const KINDS: { key: keyof NotificationPreferences; label: string }[] = [
 
 /** Profile › Notifications: the phone's permission, and a switch for each kind. */
 export function NotificationSettings() {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [permission, setPermission] = useState<PushPermission | null>(null);
@@ -111,7 +113,7 @@ export function NotificationSettings() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   card: {
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
@@ -132,4 +134,4 @@ const styles = StyleSheet.create({
     color: colors.text,
     flex: 1,
   },
-});
+}));

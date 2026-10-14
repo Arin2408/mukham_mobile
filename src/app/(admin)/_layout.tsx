@@ -1,15 +1,8 @@
 import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { colors, fonts } from '@/theme';
+import { fonts, useTheme } from '@/theme';
 
-const withHeader = {
-  headerShown: true,
-  headerStyle: { backgroundColor: colors.background },
-  headerTintColor: colors.text,
-  headerTitleStyle: { fontFamily: fonts.semibold },
-  headerShadowVisible: false,
-};
 
 /**
  * The admin's area: the tabs, plus screens on top of them: one employee's
@@ -17,7 +10,15 @@ const withHeader = {
  * and the Setup screens.
  */
 export default function AdminLayout() {
+  const { colors } = useTheme();
   const { t } = useTranslation();
+  const withHeader = {
+    headerShown: true,
+    headerStyle: { backgroundColor: colors.background },
+    headerTintColor: colors.text,
+    headerTitleStyle: { fontFamily: fonts.semibold },
+    headerShadowVisible: false,
+  };
   return (
     <Stack
       screenOptions={{

@@ -8,7 +8,7 @@ import {
   useFonts,
 } from '@expo-google-fonts/archivo';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { DarkTheme, Stack, ThemeProvider } from 'expo-router';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, type ReactNode } from 'react';
@@ -17,7 +17,7 @@ import { setOnSessionExpired } from '@/api/client';
 import { UpdateRequired } from '@/components/update-required';
 import { APP_VERSION, useAppConfig } from '@/hooks/use-server';
 import { useSession } from '@/store/session';
-import { colors } from '@/theme';
+import { ThemeProvider as AppThemeProvider, useTheme } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -25,17 +25,6 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1 } },
 });
 
-const navigationTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    primary: colors.primary,
-    background: colors.background,
-    card: colors.tabBar,
-    text: colors.text,
-    border: colors.cardBorder,
-  },
-};
 
 /** Blocks the app with "Update required" when the server asks for it. */
 function VersionGate({ children }: { children: ReactNode }) {
@@ -48,6 +37,28 @@ function VersionGate({ children }: { children: ReactNode }) {
 }
 
 export default function RootLayout() {
+  return (
+    <AppThemeProvider>
+      <Root />
+    </AppThemeProvider>
+  );
+}
+
+function Root() {
+  const { colors, scheme } = useTheme();
+  // Navigation's own colours (headers, tab bar, screen backgrounds) follow the theme.
+  const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
+  const navigationTheme = {
+    ...base,
+    colors: {
+      ...base.colors,
+      primary: colors.primary,
+      background: colors.background,
+      card: colors.tabBar,
+      text: colors.text,
+      border: colors.cardBorder,
+    },
+  };
   const [fontsLoaded] = useFonts({
     Archivo_400Regular,
     Archivo_500Medium,
@@ -81,7 +92,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={navigationTheme}>
-        <StatusBar style="light" />
+        <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         <VersionGate>
           <Stack
             screenOptions={{

@@ -1,9 +1,9 @@
 import Constants from 'expo-constants';
 import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
-import { Linking, StyleSheet, View } from 'react-native';
+import { Linking, View } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 
-import { colors, radius as corner } from '@/theme';
+import { makeStyles, radius as corner } from '@/theme';
 
 import { LEAFLET_CSS, LEAFLET_JS } from './leaflet-bundle';
 
@@ -104,6 +104,7 @@ export const OfficeMap = forwardRef<OfficeMapHandle, Props>(function OfficeMap(
   { initial, radiusMeters, satellite, onPick },
   ref,
 ) {
+  const styles = useStyles();
   const web = useRef<WebView>(null);
   // Built once; later changes go in through the handle, so the map keeps its zoom.
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -150,7 +151,7 @@ export const OfficeMap = forwardRef<OfficeMapHandle, Props>(function OfficeMap(
   );
 });
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   frame: {
     height: 320,
     borderRadius: corner.md,
@@ -162,4 +163,4 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-});
+}));

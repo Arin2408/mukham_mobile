@@ -5,7 +5,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, ZoomIn } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Linking, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Linking, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
@@ -24,7 +24,7 @@ import { LivenessDetector, livenessAvailable } from '@/features/face/liveness-de
 import { getPosition, PositionError, type Position } from '@/features/location/get-position';
 import { getDeviceId } from '@/lib/device-id';
 import { formatDistance, formatHours, formatTime } from '@/lib/format';
-import { colors, fonts, spacing, text } from '@/theme';
+import { fonts, makeStyles, spacing, useTheme } from '@/theme';
 
 type Action = 'checkin' | 'checkout';
 
@@ -37,6 +37,8 @@ type Step =
   | { kind: 'failure'; failure: Failure };
 
 export default function CheckInScreen() {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const params = useLocalSearchParams<{ action?: string }>();
@@ -269,6 +271,8 @@ type ResultProps = {
 
 /** The full-screen result: a big icon, what happened, and what to do next. */
 function Result({ icon, tone, title, lines, primary, secondary }: ResultProps) {
+  const styles = useStyles();
+  const { colors } = useTheme();
   const color = tone === 'good' ? colors.successText : colors.danger;
   return (
     <SafeAreaView style={styles.result}>
@@ -301,6 +305,7 @@ function Result({ icon, tone, title, lines, primary, secondary }: ResultProps) {
 
 /** A ring that bursts outward once behind the success tick. */
 function Burst({ color }: { color: string }) {
+  const styles = useStyles();
   const p = useSharedValue(0);
   useEffect(() => {
     p.set(withTiming(1, { duration: 900, easing: easeOut }));
@@ -312,7 +317,7 @@ function Burst({ color }: { color: string }) {
   return <Animated.View style={[styles.burst, { borderColor: color }, style]} pointerEvents="none" />;
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   fill: {
     flex: 1,
     backgroundColor: colors.background,
@@ -364,4 +369,4 @@ const styles = StyleSheet.create({
   actions: {
     gap: spacing.sm,
   },
-});
+}));

@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 type Props = {
   current: string;
@@ -12,6 +12,8 @@ type Props = {
 
 /** Shown instead of the app when the server says this version is too old. */
 export function UpdateRequired({ current, required, onRetry }: Props) {
+  const styles = useStyles();
+  const { text } = useTheme();
   const { t } = useTranslation();
 
   return (
@@ -32,7 +34,7 @@ export function UpdateRequired({ current, required, onRetry }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -62,4 +64,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.primaryText,
   },
-});
+}));

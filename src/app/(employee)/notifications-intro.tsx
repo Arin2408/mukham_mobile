@@ -2,18 +2,20 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/button';
 import { askPushPermission, markPushAsked, registerForPush } from '@/features/notifications/push';
-import { colors, fonts, spacing, text } from '@/theme';
+import { fonts, makeStyles, spacing, useTheme } from '@/theme';
 
 /**
  * Shown once, before the phone's own permission question, so people know
  * what the reminders are for. "Not now" leaves the choice in Profile.
  */
 export default function NotificationsIntroScreen() {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
 
@@ -60,7 +62,7 @@ export default function NotificationsIntroScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -102,4 +104,4 @@ const styles = StyleSheet.create({
   actions: {
     gap: spacing.sm,
   },
-});
+}));

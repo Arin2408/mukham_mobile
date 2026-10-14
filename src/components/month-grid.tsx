@@ -1,9 +1,9 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { memo, useMemo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { formatMonth, startOfWeek, toDateParam, WEEK_LABELS } from '@/lib/format';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 type Props = {
   /** Any day in the month to show. */
@@ -18,6 +18,8 @@ type Props = {
 
 /** A month of days, Monday first, with arrows to change month. Plain views, no native module. */
 export const MonthGrid = memo(function MonthGrid({ month, onMonthChange, selected, onSelect, marks }: Props) {
+  const styles = useStyles();
+  const { colors } = useTheme();
   const weeks = useMemo(() => monthWeeks(month), [month]);
   const today = toDateParam(new Date());
   const shift = (by: number) => onMonthChange(new Date(month.getFullYear(), month.getMonth() + by, 1));
@@ -91,7 +93,7 @@ export function monthWeeks(month: Date): Day[][] {
   return weeks;
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   box: {
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
@@ -140,7 +142,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   today: {
-    color: '#60A5FA',
+    color: colors.infoText,
     fontFamily: fonts.bold,
   },
   selectedText: {
@@ -153,6 +155,6 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   dotOn: {
-    backgroundColor: '#60A5FA',
+    backgroundColor: colors.infoText,
   },
-});
+}));

@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { adminSignIn, cleanMobile, employeePasswordStep, isFaceRegistered } from '@/api/auth';
@@ -11,14 +11,17 @@ import { ErrorBanner } from '@/components/error-banner';
 import { Segmented } from '@/components/segmented';
 import { TextField } from '@/components/text-field';
 import { Gradient } from '@/components/ui/gradient';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { FadeIn } from '@/components/ui/motion';
 import { BrandPanel } from '@/features/brand/brand-panel';
 import { useEmployeeSignIn, useSession } from '@/store/session';
-import { colors, gradients, radius, spacing, text } from '@/theme';
+import { makeStyles, radius, spacing, useTheme } from '@/theme';
 
 type Role = 'employee' | 'admin';
 
 export default function SignInScreen() {
+  const styles = useStyles();
+  const { text, gradients } = useTheme();
   const { t } = useTranslation();
   const signIn = useSession((s) => s.signIn);
   const startEmployeeSignIn = useEmployeeSignIn((s) => s.start);
@@ -71,7 +74,10 @@ export default function SignInScreen() {
           <FadeIn index={3} style={styles.cardWrap}>
             <Gradient colors={gradients.border} style={styles.border}>
               <View style={styles.card}>
-                <Text style={text.heading}>{t('signIn.title')}</Text>
+                <View style={styles.titleRow}>
+                  <Text style={[text.heading, styles.grow]}>{t('signIn.title')}</Text>
+                  <ThemeToggle />
+                </View>
                 <Text style={[text.muted, styles.subtitle]}>{t('signIn.subtitle')}</Text>
 
                 <Segmented
@@ -127,7 +133,7 @@ export default function SignInScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -149,6 +155,13 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.md,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  grow: {
+    flex: 1,
+  },
   subtitle: {
     marginTop: -spacing.sm,
   },
@@ -158,4 +171,4 @@ const styles = StyleSheet.create({
   center: {
     textAlign: 'center',
   },
-});
+}));

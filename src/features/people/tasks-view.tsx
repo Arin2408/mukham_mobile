@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 
 import { getOrgTasks, type Task } from '@/api/tasks';
 import { monthWeeks, MonthGrid } from '@/components/month-grid';
@@ -11,7 +11,7 @@ import { StateView } from '@/components/state-view';
 import { TaskPills } from '@/features/tasks/task-pills';
 import { formatDate, formatDateShort, toDateParam } from '@/lib/format';
 import { PressableScale } from '@/components/ui/motion';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 /** Tasks running on a day: assigned on or before it, and not completed before it. */
 export function tasksOn(tasks: Task[], day: string): Task[] {
@@ -20,6 +20,8 @@ export function tasksOn(tasks: Task[], day: string): Task[] {
 
 /** People › Tasks: a month calendar; tap a day for its tasks. */
 export function TasksView() {
+  const styles = useStyles();
+  const { colors } = useTheme();
   const { t } = useTranslation();
   const [month, setMonth] = useState(() => new Date());
   const [selected, setSelected] = useState(() => toDateParam(new Date()));
@@ -81,6 +83,8 @@ export function TasksView() {
 }
 
 function TaskRow({ task }: { task: Task }) {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   const status = {
     pending: t('tasks.pending'),
@@ -108,7 +112,7 @@ function TaskRow({ task }: { task: Task }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   fill: {
     flex: 1,
   },
@@ -161,4 +165,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.primaryText,
   },
-});
+}));

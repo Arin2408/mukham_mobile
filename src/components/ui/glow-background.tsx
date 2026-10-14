@@ -1,6 +1,8 @@
 import { Image, StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
+import { useTheme } from '@/theme';
+
 import { useLoop } from './motion';
 
 const GLOW = require('../../../assets/images/glow.png');
@@ -38,12 +40,15 @@ type Props = {
 
 /** Soft blue, purple and cyan light drifting slowly, as behind the web's sign-in. */
 export function GlowBackground({ variant = 'page' }: Props) {
+  const { scheme } = useTheme();
   const strong = variant === 'panel';
+  // On a white page the same glow looks twice as strong.
+  const k = !strong && scheme === 'light' ? 0.5 : 1;
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <Blob color={strong ? '#22D3EE' : '#3B82F6'} size={340} top={-140} left={-120} opacity={strong ? 0.45 : 0.22} delay={0} />
-      <Blob color={strong ? '#D946EF' : '#A855F7'} size={380} top={strong ? 60 : 260} left={140} opacity={strong ? 0.4 : 0.18} delay={6000} />
-      {strong ? null : <Blob color="#06B6D4" size={260} top={520} left={-60} opacity={0.12} delay={3000} />}
+      <Blob color={strong ? '#22D3EE' : '#3B82F6'} size={340} top={-140} left={-120} opacity={(strong ? 0.25 : 0.22) * k} delay={0} />
+      <Blob color={strong ? '#D946EF' : '#A855F7'} size={380} top={strong ? 60 : 260} left={140} opacity={(strong ? 0.22 : 0.18) * k} delay={6000} />
+      {strong ? null : <Blob color="#06B6D4" size={260} top={520} left={-60} opacity={0.12 * k} delay={3000} />}
     </View>
   );
 }

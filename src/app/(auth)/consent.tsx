@@ -2,14 +2,16 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { Screen } from '@/components/screen';
-import { colors, fonts, spacing, text } from '@/theme';
+import { fonts, makeStyles, spacing, useTheme } from '@/theme';
 
 /** Shown once, before a face is saved for the first time (India's DPDP Act). */
 export default function ConsentScreen() {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   const [agreed, setAgreed] = useState(false);
 
@@ -40,7 +42,7 @@ export default function ConsentScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   points: {
     gap: spacing.md,
   },
@@ -56,4 +58,4 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingVertical: spacing.sm,
   },
-});
+}));

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { getAttendanceHistory, type HistoryRecord } from '@/api/attendance';
 import { BarChart } from '@/components/bar-chart';
@@ -21,9 +21,10 @@ import {
   type RangePreset,
   WEEK_LABELS,
 } from '@/lib/format';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 export default function HistoryScreen() {
+  const { text } = useTheme();
   const { t } = useTranslation();
   const [preset, setPreset] = useState<RangePreset>('week');
 
@@ -101,6 +102,7 @@ export default function HistoryScreen() {
 }
 
 function HistoryRow({ record }: { record: HistoryRecord }) {
+  const styles = useStyles();
   const { t } = useTranslation();
   const open = !record.check_out;
 
@@ -125,7 +127,7 @@ function HistoryRow({ record }: { record: HistoryRecord }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   row: {
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
@@ -157,4 +159,4 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginTop: spacing.xs,
   },
-});
+}));

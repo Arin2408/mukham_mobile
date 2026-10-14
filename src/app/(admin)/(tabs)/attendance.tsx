@@ -3,18 +3,20 @@ import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
 
 import { getOrgEmployees, getOrgHistory, type OrgEmployee, type OrgRecord } from '@/api/admin';
 import { ListScreen } from '@/components/list-screen';
 import { StateView } from '@/components/state-view';
 import { daysAgo, dayStatus, formatHours, formatTime, type DayStatus } from '@/lib/format';
 import { PressableScale } from '@/components/ui/motion';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 type Row = { employee: OrgEmployee; status: DayStatus };
 
 export default function AdminAttendanceScreen() {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
 
@@ -103,6 +105,8 @@ export default function AdminAttendanceScreen() {
 }
 
 const EmployeeRow = memo(function EmployeeRow({ row }: { row: Row }) {
+  const styles = useStyles();
+  const { colors } = useTheme();
   const { t } = useTranslation();
   const { employee: e, status } = row;
   const line =
@@ -130,7 +134,7 @@ const EmployeeRow = memo(function EmployeeRow({ row }: { row: Row }) {
   );
 });
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   search: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -176,9 +180,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   in: {
-    color: '#4ADE80',
+    color: colors.successText,
   },
   absent: {
-    color: '#F87171',
+    color: colors.dangerText,
   },
-});
+}));

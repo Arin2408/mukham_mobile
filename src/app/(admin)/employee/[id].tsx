@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, Text, View } from 'react-native';
 
 import { getOrgEmployees, getOrgHistory, markManually, type OrgRecord } from '@/api/admin';
 import { errorMessage } from '@/api/errors';
@@ -11,12 +11,14 @@ import { ListScreenBody } from '@/components/list-screen';
 import { Pill } from '@/components/pill';
 import { StateView } from '@/components/state-view';
 import { daysAgo, dayStatus, formatDay, formatHours, formatTime } from '@/lib/format';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 const DAYS = 30;
 
 /** One employee's last 30 days, with a manual check-in or check-out at the current time. */
 export default function EmployeeAttendanceScreen() {
+  const styles = useStyles();
+  const { text } = useTheme();
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const employeeId = Number(id);
@@ -111,6 +113,8 @@ export default function EmployeeAttendanceScreen() {
 }
 
 function DayRow({ record }: { record: OrgRecord }) {
+  const styles = useStyles();
+  const { text } = useTheme();
   const { t } = useTranslation();
   return (
     <View style={styles.row}>
@@ -131,17 +135,17 @@ function DayRow({ record }: { record: OrgRecord }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   status: {
     fontFamily: fonts.semibold,
     fontSize: 17,
     color: colors.text,
   },
   in: {
-    color: '#4ADE80',
+    color: colors.successText,
   },
   absent: {
-    color: '#F87171',
+    color: colors.dangerText,
   },
   section: {
     ...text.heading,
@@ -169,4 +173,4 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginTop: spacing.xs,
   },
-});
+}));

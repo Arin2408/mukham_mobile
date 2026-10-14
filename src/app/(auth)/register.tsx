@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { cleanMobile, registerOrganisation } from '@/api/auth';
 import { errorMessage } from '@/api/errors';
@@ -9,9 +9,10 @@ import { Button } from '@/components/button';
 import { ErrorBanner } from '@/components/error-banner';
 import { Screen } from '@/components/screen';
 import { TextField } from '@/components/text-field';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing } from '@/theme';
 
 export default function RegisterScreen() {
+  const styles = useStyles();
   const { t } = useTranslation();
   const [form, setForm] = useState({ name: '', mobile: '', email: '', details: '' });
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +78,7 @@ export default function RegisterScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   body: {
     ...text.body,
     lineHeight: 22,
@@ -96,4 +97,4 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     color: colors.text,
   },
-});
+}));

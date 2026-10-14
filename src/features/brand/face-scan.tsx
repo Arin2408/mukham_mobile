@@ -5,7 +5,7 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
 import { useCycle, useLoop } from '@/components/ui/motion';
-import { colors, fonts } from '@/theme';
+import { fonts, useTheme } from '@/theme';
 
 const SIZE = 132;
 
@@ -21,6 +21,7 @@ function Ring({ delay }: { delay: number }) {
 
 /** The web's face-scan illustration: face icon, scan line, pulsing rings, corner brackets, a status chip. */
 export function FaceScan() {
+  const { colors } = useTheme();
   const { t } = useTranslation();
   const scan = useCycle(2800);
   const float = useLoop(6000);

@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
 import { useEffect } from 'react';
 
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 import { easeOut } from './ui/motion';
 
@@ -25,6 +25,8 @@ type Props = {
 
 /** A small bar chart drawn with plain views (no chart library, no native code). */
 export function BarChart({ labels, values, max: fullHeight, formatValue, highlight, title, total }: Props) {
+  const styles = useStyles();
+  const { text } = useTheme();
   const max = Math.max(fullHeight, ...values);
 
   return (
@@ -58,6 +60,7 @@ export function BarChart({ labels, values, max: fullHeight, formatValue, highlig
 
 /** One bar, growing from the bottom to its height, a little after the one before. */
 function Bar({ height, index, today }: { height: number; index: number; today: boolean }) {
+  const styles = useStyles();
   const h = useSharedValue(0);
   useEffect(() => {
     h.set(withDelay(150 + index * 50, withTiming(height, { duration: 600, easing: easeOut })));
@@ -66,7 +69,7 @@ function Bar({ height, index, today }: { height: number; index: number; today: b
   return <Animated.View style={[styles.bar, today && styles.today, style]} />;
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   card: {
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
@@ -119,4 +122,4 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontFamily: fonts.semibold,
   },
-});
+}));

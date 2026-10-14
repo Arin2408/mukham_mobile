@@ -5,14 +5,17 @@ import { StyleSheet, Text, View } from 'react-native';
 import { GlowBackground } from '@/components/ui/glow-background';
 import { Gradient } from '@/components/ui/gradient';
 import { FadeIn } from '@/components/ui/motion';
-import { fonts, gradients, spacing } from '@/theme';
+import { fonts, spacing, useTheme } from '@/theme';
 
 import { FaceScan } from './face-scan';
 
 type Props = { tagline: string; scan?: boolean; topInset?: number };
 
+// The face-scan illustration is off by default: the sign-in page stays calm.
+
 /** The sign-in header, as the web's brand panel: gradient, glows, logo, face scan. */
-export function BrandPanel({ tagline, scan = true, topInset = 0 }: Props) {
+export function BrandPanel({ tagline, scan = false, topInset = 0 }: Props) {
+  const { gradients } = useTheme();
   const { t } = useTranslation();
   return (
     <Gradient colors={gradients.panel} style={[styles.panel, { paddingTop: topInset + spacing.lg }]}>
@@ -42,7 +45,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.lg,
     paddingBottom: spacing.xl + spacing.lg,
     overflow: 'hidden',
-    gap: spacing.lg,
+    gap: spacing.xl,
   },
   logoRow: {
     flexDirection: 'row',
@@ -70,7 +73,7 @@ const styles = StyleSheet.create({
   },
   headline: {
     fontFamily: fonts.bold,
-    fontSize: 26,
+    fontSize: 24,
     color: '#FFFFFF',
   },
   tagline: {

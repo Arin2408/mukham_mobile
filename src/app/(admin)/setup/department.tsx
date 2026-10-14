@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { errorMessage } from '@/api/errors';
@@ -22,10 +22,11 @@ import { PickerField } from '@/components/picker-field';
 import { StateView } from '@/components/state-view';
 import { TextField } from '@/components/text-field';
 import { DesignationRow } from '@/features/setup/designation-row';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 /** Add a department (no id) or edit one and its designations (?id=). */
 export default function DepartmentScreen() {
+  const styles = useStyles();
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const departmentId = id ? Number(id) : null;
@@ -57,6 +58,8 @@ export default function DepartmentScreen() {
 }
 
 function DepartmentForm({ existing, offices }: { existing?: Department; offices: { id: number; name: string }[] }) {
+  const styles = useStyles();
+  const { text } = useTheme();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   // Plain conditionals: see the note in setup/shift.tsx about the React Compiler.
@@ -128,6 +131,8 @@ function DeleteDepartment({ department, onDone }: { department: Department; onDo
 
 /** The department's designations: add, rename, remove. */
 function Designations({ department }: { department: Department }) {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const designations = useQuery({ queryKey: ['admin', 'designations'], queryFn: getDesignations });
@@ -168,7 +173,7 @@ function Designations({ department }: { department: Department }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -199,4 +204,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text,
   },
-});
+}));

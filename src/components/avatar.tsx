@@ -1,11 +1,13 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Image } from 'expo-image';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
-import { colors } from '@/theme';
+import { makeStyles, useTheme } from '@/theme';
 
 /** The employee's photo in a circle, or a person icon when there is none. */
 export function Avatar({ uri, size = 96 }: { uri: string | null; size?: number }) {
+  const styles = useStyles();
+  const { colors } = useTheme();
   const style = { width: size, height: size, borderRadius: size / 2 };
   if (!uri) {
     return (
@@ -17,7 +19,7 @@ export function Avatar({ uri, size = 96 }: { uri: string | null; size?: number }
   return <Image source={{ uri }} style={[styles.avatar, style]} contentFit="cover" transition={150} />;
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   avatar: {
     backgroundColor: colors.card,
   },
@@ -28,4 +30,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+}));

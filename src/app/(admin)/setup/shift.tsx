@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { errorMessage } from '@/api/errors';
@@ -24,10 +24,11 @@ import { TextField } from '@/components/text-field';
 import { TimeField } from '@/components/time-field';
 import { formatDuration, shiftLength } from '@/lib/format';
 import { departmentLabel } from '@/lib/setup-labels';
-import { colors, radius, spacing, text } from '@/theme';
+import { makeStyles, radius, spacing, useTheme } from '@/theme';
 
 /** Add a shift (no id) or edit one (?id=), give it to a department, or delete it. */
 export default function ShiftScreen() {
+  const styles = useStyles();
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const shiftId = id ? Number(id) : null;
@@ -65,6 +66,8 @@ export default function ShiftScreen() {
 }
 
 function ShiftForm({ existing, departments }: { existing?: Shift; departments: { id: number; name: string }[] }) {
+  const styles = useStyles();
+  const { text } = useTheme();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   // Plain conditionals, not `existing?.a.b`: the React Compiler can drop the
@@ -129,6 +132,7 @@ type ActionsProps = { shift: Shift; departments: { id: number; name: string }[];
 
 /** For a saved shift: give it to its whole department, or delete it. */
 function ShiftActions({ shift, departments, onDone }: ActionsProps) {
+  const { text } = useTheme();
   const { t } = useTranslation();
   // The saved department, not an unsaved change in the form above.
   const departmentName = departments.find((d) => d.id === shift.department_id)?.name ?? '';
@@ -189,7 +193,7 @@ function ShiftActions({ shift, departments, onDone }: ActionsProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -208,4 +212,4 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     padding: spacing.md,
   },
-});
+}));

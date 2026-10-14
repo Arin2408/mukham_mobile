@@ -1,17 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getDepartments, getDesignations, getOffices } from '@/api/setup';
 import { Button } from '@/components/button';
 import { LinkRow } from '@/components/link-row';
 import { StateView } from '@/components/state-view';
-import { colors, spacing } from '@/theme';
+import { makeStyles, spacing } from '@/theme';
 
 /** Departments, each with its office and designations. */
 export default function DepartmentsScreen() {
+  const styles = useStyles();
   const { t } = useTranslation();
   const departments = useQuery({ queryKey: ['admin', 'departments'], queryFn: getDepartments });
   const designations = useQuery({ queryKey: ['admin', 'designations'], queryFn: getDesignations });
@@ -57,7 +58,7 @@ export default function DepartmentsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -66,4 +67,4 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     gap: spacing.sm,
   },
-});
+}));

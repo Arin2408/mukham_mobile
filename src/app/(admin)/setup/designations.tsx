@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { errorMessage } from '@/api/errors';
@@ -13,10 +13,12 @@ import { StateView } from '@/components/state-view';
 import { TextField } from '@/components/text-field';
 import { DesignationRow } from '@/features/setup/designation-row';
 import { departmentLabel } from '@/lib/setup-labels';
-import { colors, radius, spacing, text } from '@/theme';
+import { makeStyles, radius, spacing, useTheme } from '@/theme';
 
 /** Every designation, grouped by department and office; add, rename, delete. */
 export default function DesignationsScreen() {
+  const styles = useStyles();
+  const { text } = useTheme();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const designations = useQuery({ queryKey: ['admin', 'designations'], queryFn: getDesignations });
@@ -89,7 +91,7 @@ export default function DesignationsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -114,4 +116,4 @@ const styles = StyleSheet.create({
     ...text.heading,
     fontSize: 16,
   },
-});
+}));

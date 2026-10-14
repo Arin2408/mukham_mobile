@@ -1,9 +1,10 @@
 import { Stack } from 'expo-router';
 
-import { colors } from '@/theme';
+import { useTheme } from '@/theme';
 
 /** Sign-in, face enrolment, organisation sign-up and password reset. */
 export default function AuthLayout() {
+  const { colors } = useTheme();
   return (
     <Stack
       screenOptions={{

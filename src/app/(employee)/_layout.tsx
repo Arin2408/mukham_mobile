@@ -1,13 +1,14 @@
 import { Stack } from 'expo-router';
 
 import { usePushSetup } from '@/features/notifications/use-push-setup';
-import { colors, fonts } from '@/theme';
+import { fonts, useTheme } from '@/theme';
 
 /**
  * The employee's area: the tabs, plus screens on top of them: check-in,
  * a task's details and the ID card.
  */
 export default function EmployeeLayout() {
+  const { colors } = useTheme();
   usePushSetup();
 
   return (

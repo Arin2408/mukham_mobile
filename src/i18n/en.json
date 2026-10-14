@@ -421,5 +421,12 @@
     "faceVerified": "Face verified",
     "faceCheck": "Live face check",
     "tagline": "Real faces, real locations, real time."
+  },
+  "theme": {
+    "toLight": "Switch to light mode",
+    "toDark": "Switch to dark mode",
+    "title": "Appearance",
+    "dark": "Dark",
+    "light": "Light"
   }
 }

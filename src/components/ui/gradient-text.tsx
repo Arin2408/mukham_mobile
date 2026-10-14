@@ -1,6 +1,6 @@
-import { StyleSheet, Text, type StyleProp, type TextStyle } from 'react-native';
+import { Text, type StyleProp, type TextStyle } from 'react-native';
 
-import { colors as palette, gradients } from '@/theme';
+import { makeStyles, useTheme } from '@/theme';
 
 import { Gradient, maskedView } from './gradient';
 
@@ -12,7 +12,9 @@ type Props = {
 };
 
 /** Text filled with a left-to-right gradient, like the web's page titles. */
-export function GradientText({ children, style, colors = gradients.title, accessibilityRole }: Props) {
+export function GradientText({ children, style, colors, accessibilityRole }: Props) {
+  const { gradients } = useTheme();
+  const styles = useStyles();
   const masked = maskedView();
   if (!masked) {
     return (
@@ -28,7 +30,7 @@ export function GradientText({ children, style, colors = gradients.title, access
       accessibilityRole={accessibilityRole}
       accessibilityLabel={children}
       maskElement={<Text style={style}>{children}</Text>}>
-      <Gradient colors={colors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+      <Gradient colors={colors ?? gradients.title} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
         {/* Invisible copy that gives the gradient the text's size. */}
         <Text style={[style, styles.hidden]}>{children}</Text>
       </Gradient>
@@ -36,11 +38,11 @@ export function GradientText({ children, style, colors = gradients.title, access
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   hidden: {
     opacity: 0,
   },
   fallback: {
-    color: palette.infoText,
+    color: colors.infoText,
   },
-});
+}));

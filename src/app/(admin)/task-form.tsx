@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { errorMessage } from '@/api/errors';
@@ -26,10 +26,11 @@ import { StateView } from '@/components/state-view';
 import { TextField } from '@/components/text-field';
 import { validateTask } from '@/features/people/validate';
 import { toDateParam } from '@/lib/format';
-import { colors, spacing, text } from '@/theme';
+import { makeStyles, spacing, useTheme } from '@/theme';
 
 /** Assign a task (?date= to start on a day) or edit one (?id=). */
 export default function TaskFormScreen() {
+  const styles = useStyles();
   const { t } = useTranslation();
   const { id, date } = useLocalSearchParams<{ id?: string; date?: string }>();
   const taskId = id ? Number(id) : null;
@@ -64,6 +65,8 @@ export default function TaskFormScreen() {
 type FormProps = { existing?: Task; employees: Employee[]; startDate: string };
 
 function TaskForm({ existing, employees, startDate }: FormProps) {
+  const styles = useStyles();
+  const { text } = useTheme();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [employeeId, setEmployeeId] = useState<number | null>(existing?.employee_id ?? null);
@@ -167,7 +170,7 @@ function TaskForm({ existing, employees, startDate }: FormProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -177,4 +180,4 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingBottom: spacing.xl,
   },
-});
+}));

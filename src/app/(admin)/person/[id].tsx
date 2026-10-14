@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { mediaUrl } from '@/api/config';
@@ -11,12 +11,14 @@ import { Avatar } from '@/components/avatar';
 import { Button } from '@/components/button';
 import { ErrorBanner } from '@/components/error-banner';
 import { StateView } from '@/components/state-view';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 const shown = (value: string | null | undefined) => (value && value !== 'N/A' ? value : null);
 
 /** One employee, for the admin: details, Edit, ID card, Remove. */
 export default function PersonScreen() {
+  const styles = useStyles();
+  const { text } = useTheme();
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const employeeId = Number(id);
@@ -85,7 +87,7 @@ export default function PersonScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -100,7 +102,7 @@ const styles = StyleSheet.create({
   },
   pending: {
     ...text.muted,
-    color: '#FACC15',
+    color: colors.warningText,
   },
   card: {
     backgroundColor: colors.card,
@@ -118,4 +120,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text,
   },
-});
+}));

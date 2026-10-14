@@ -1,12 +1,14 @@
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { API_BASE_URL } from '@/api/config';
 import { useServerStatus } from '@/hooks/use-server';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 /** A small line showing whether the app can reach the server. */
 export function ServerStatus() {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   const { isPending, isError } = useServerStatus();
 
@@ -30,7 +32,7 @@ export function ServerStatus() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -55,4 +57,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text,
   },
-});
+}));

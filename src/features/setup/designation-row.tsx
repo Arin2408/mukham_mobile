@@ -2,14 +2,16 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, Text, TextInput, View } from 'react-native';
 
 import { errorMessage } from '@/api/errors';
 import { deleteDesignation, updateDesignation, type Designation } from '@/api/setup';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 /** One designation: tap the pencil to rename, the bin to delete. */
 export function DesignationRow({ designation, onChanged }: { designation: Designation; onChanged: () => void }) {
+  const styles = useStyles();
+  const { colors } = useTheme();
   const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(designation.details);
@@ -67,7 +69,7 @@ export function DesignationRow({ designation, onChanged }: { designation: Design
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -90,4 +92,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text,
   },
-});
+}));

@@ -1,8 +1,8 @@
 import type { ReactElement, ReactNode } from 'react';
-import { FlatList, RefreshControl, StyleSheet, View, type ListRenderItem } from 'react-native';
+import { FlatList, RefreshControl, View, type ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { colors, spacing, text } from '@/theme';
+import { makeStyles, spacing, useTheme } from '@/theme';
 
 import { GlowBackground } from './ui/glow-background';
 import { GradientText } from './ui/gradient-text';
@@ -28,6 +28,8 @@ type Props<T> = {
  * months of history stay smooth on a low-end phone.
  */
 export function ListScreen<T>({ title, header, ...rest }: Props<T>) {
+  const styles = useStyles();
+  const { text } = useTheme();
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <GlowBackground />
@@ -35,10 +37,12 @@ export function ListScreen<T>({ title, header, ...rest }: Props<T>) {
         {...rest}
         header={
           <>
-            <FadeIn style={styles.title}>
-              <GradientText style={text.title} accessibilityRole="header">
-                {title}
-              </GradientText>
+            <FadeIn style={styles.titleRow}>
+              <View style={styles.titleText}>
+                <GradientText style={text.title} accessibilityRole="header">
+                  {title}
+                </GradientText>
+              </View>
             </FadeIn>
             {header}
           </>
@@ -59,6 +63,8 @@ export function ListScreenBody<T>({
   onRefresh,
   bottomSpace = 0,
 }: Omit<Props<T>, 'title'>) {
+  const styles = useStyles();
+  const { colors } = useTheme();
   return (
     <FlatList
       style={styles.list}
@@ -83,10 +89,11 @@ export function ListScreenBody<T>({
 }
 
 function Separator() {
+  const styles = useStyles();
   return <View style={styles.separator} />;
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -101,10 +108,16 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     marginBottom: spacing.md,
   },
-  title: {
+  titleRow: {
     marginTop: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  titleText: {
+    flex: 1,
   },
   separator: {
     height: spacing.sm,
   },
-});
+}));

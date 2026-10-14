@@ -1,20 +1,23 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { getMyProfile } from '@/api/attendance';
 import { mediaUrl } from '@/api/config';
 import { Avatar } from '@/components/avatar';
 import { Button } from '@/components/button';
 import { Screen } from '@/components/screen';
+import { AppearanceCard } from '@/components/ui/appearance-card';
 import { SignOutSection } from '@/components/sign-out-section';
 import { NotificationSettings } from '@/features/notifications/notification-settings';
 import { StateView } from '@/components/state-view';
 import { formatShiftTime } from '@/lib/format';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 export default function ProfileScreen() {
+  const styles = useStyles();
+  const { text } = useTheme();
   const { t } = useTranslation();
   const profile = useQuery({ queryKey: ['profile'], queryFn: getMyProfile });
   const p = profile.data;
@@ -63,13 +66,14 @@ export default function ProfileScreen() {
           <Button label={t('profile.showIdCard')} onPress={() => router.push('/id-card')} />
         </>
       )}
+      <AppearanceCard />
       <NotificationSettings />
       <SignOutSection />
     </Screen>
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   avatar: {
     marginBottom: spacing.sm,
   },
@@ -93,4 +97,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text,
   },
-});
+}));

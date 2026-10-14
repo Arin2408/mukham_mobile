@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { getDepartments, getDesignations, getOffices, getShifts } from '@/api/setup';
 import { LinkRow } from '@/components/link-row';
 import { Screen } from '@/components/screen';
+import { AppearanceCard } from '@/components/ui/appearance-card';
 import { ServerStatus } from '@/components/server-status';
 import { SignOutSection } from '@/components/sign-out-section';
 
@@ -56,6 +57,7 @@ export default function AdminSetupScreen() {
         onPress={() => router.push('/setup/offices')}
       />
       <LinkRow title={t('setup.profile')} detail={t('setup.profileDetail')} onPress={() => router.push('/setup/profile')} />
+      <AppearanceCard />
       <ServerStatus />
       <SignOutSection />
     </Screen>

@@ -1,6 +1,6 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
-import { colors, fonts, radius } from '@/theme';
+import { fonts, makeStyles, radius } from '@/theme';
 
 type Option<T extends string> = { value: T; label: string };
 
@@ -12,6 +12,7 @@ type Props<T extends string> = {
 
 /** Two or three side-by-side choices, e.g. Employee / Admin. */
 export function Segmented<T extends string>({ options, value, onChange }: Props<T>) {
+  const styles = useStyles();
   return (
     <View style={styles.row} accessibilityRole="tablist">
       {options.map((option) => {
@@ -31,7 +32,7 @@ export function Segmented<T extends string>({ options, value, onChange }: Props<
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   row: {
     flexDirection: 'row',
     backgroundColor: colors.cardRaised,
@@ -59,4 +60,4 @@ const styles = StyleSheet.create({
   selectedLabel: {
     color: colors.text,
   },
-});
+}));

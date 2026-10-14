@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { getTasks, type Task, type TaskStatus } from '@/api/tasks';
 import { ListScreen } from '@/components/list-screen';
@@ -12,7 +12,7 @@ import { StateView } from '@/components/state-view';
 import { TaskPills } from '@/features/tasks/task-pills';
 import { formatDate } from '@/lib/format';
 import { PressableScale } from '@/components/ui/motion';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 export default function TasksScreen() {
   const { t } = useTranslation();
@@ -52,6 +52,8 @@ export default function TasksScreen() {
 }
 
 function TaskRow({ task }: { task: Task }) {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   return (
     <PressableScale
@@ -72,7 +74,7 @@ function TaskRow({ task }: { task: Task }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -95,4 +97,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text,
   },
-});
+}));

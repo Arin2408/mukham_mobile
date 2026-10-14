@@ -2,7 +2,7 @@ import { useCameraPermissions } from 'expo-camera';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 
 import {
   completeEmployeeSignIn,
@@ -18,7 +18,7 @@ import { Screen } from '@/components/screen';
 import { CameraPermissionRequest } from '@/features/face/camera-permission';
 import { LivenessDetector, livenessAvailable } from '@/features/face/liveness-detector';
 import { useEmployeeSignIn, useSession } from '@/store/session';
-import { colors, spacing, text } from '@/theme';
+import { makeStyles, spacing, useTheme } from '@/theme';
 
 type Check = { sessionId: string; region: string; credentials: LivenessCredentials };
 
@@ -30,6 +30,8 @@ type Step =
   | { kind: 'expired' };
 
 export default function FaceScreen() {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   const signIn = useSession((s) => s.signIn);
   const { mobile, preAuthToken, faceRegistered, reset } = useEmployeeSignIn();
@@ -171,7 +173,7 @@ export default function FaceScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   body: {
     ...text.body,
     lineHeight: 22,
@@ -185,4 +187,4 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-});
+}));

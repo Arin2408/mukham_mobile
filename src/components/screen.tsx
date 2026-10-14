@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
-import { RefreshControl, ScrollView, StyleSheet } from 'react-native';
+import { RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { colors, spacing, text } from '@/theme';
+import { makeStyles, spacing, useTheme } from '@/theme';
 
 import { GlowBackground } from './ui/glow-background';
 import { GradientText } from './ui/gradient-text';
@@ -18,6 +18,8 @@ type Props = {
 
 /** The frame every tab screen uses: safe area, a faint glow, the gradient title, scrolling content. */
 export function Screen({ title, children, refreshing, onRefresh }: Props) {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <GlowBackground />
@@ -28,10 +30,12 @@ export function Screen({ title, children, refreshing, onRefresh }: Props) {
             <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
           ) : undefined
         }>
-        <FadeIn style={styles.title}>
-          <GradientText style={text.title} accessibilityRole="header">
-            {title}
-          </GradientText>
+        <FadeIn style={styles.titleRow}>
+          <View style={styles.titleText}>
+            <GradientText style={text.title} accessibilityRole="header">
+              {title}
+            </GradientText>
+          </View>
         </FadeIn>
         {children}
       </ScrollView>
@@ -39,7 +43,7 @@ export function Screen({ title, children, refreshing, onRefresh }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -48,7 +52,13 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     gap: spacing.md,
   },
-  title: {
+  titleRow: {
     marginTop: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
-});
+  titleText: {
+    flex: 1,
+  },
+}));

@@ -3,19 +3,21 @@ import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, Text, TextInput, View } from 'react-native';
 
 import { errorMessage } from '@/api/errors';
 import { getEmployees, type Employee } from '@/api/people';
 import { ListScreenBody } from '@/components/list-screen';
 import { StateView } from '@/components/state-view';
 import { PressableScale } from '@/components/ui/motion';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 import { shareEmployeesCsv } from './share-csv';
 
 /** People › Employees: search, open, add, export. */
 export function EmployeesView() {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [exporting, setExporting] = useState(false);
@@ -105,6 +107,8 @@ export function EmployeesView() {
 }
 
 const EmployeeRow = memo(function EmployeeRow({ employee: e }: { employee: Employee }) {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   const role = [e.designation_name, e.department_name].filter((v) => v && v !== 'N/A').join(' · ');
   return (
@@ -127,7 +131,7 @@ const EmployeeRow = memo(function EmployeeRow({ employee: e }: { employee: Emplo
   );
 });
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   fill: {
     flex: 1,
   },
@@ -157,7 +161,7 @@ const styles = StyleSheet.create({
   link: {
     fontFamily: fonts.semibold,
     fontSize: 14,
-    color: '#60A5FA',
+    color: colors.infoText,
   },
   row: {
     flexDirection: 'row',
@@ -183,7 +187,7 @@ const styles = StyleSheet.create({
   },
   pending: {
     ...text.muted,
-    color: '#FACC15',
+    color: colors.warningText,
   },
   fab: {
     position: 'absolute',
@@ -202,4 +206,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.primaryText,
   },
-});
+}));

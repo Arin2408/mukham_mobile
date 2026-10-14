@@ -1,9 +1,9 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { ApiError, errorMessage } from '@/api/errors';
-import { colors, fonts, spacing, text } from '@/theme';
+import { fonts, makeStyles, spacing, useTheme } from '@/theme';
 
 import { Button } from './button';
 import { Skeleton } from './ui/skeleton';
@@ -16,6 +16,8 @@ type Props =
 
 /** What a list shows when it has no rows: loading, nothing yet, offline or failed. */
 export function StateView(props: Props) {
+  const styles = useStyles();
+  const { colors } = useTheme();
   const { t } = useTranslation();
 
   if (props.kind === 'loading') {
@@ -42,7 +44,7 @@ export function StateView(props: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   box: {
     alignItems: 'center',
     gap: spacing.sm,
@@ -60,4 +62,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
-});
+}));

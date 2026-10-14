@@ -4,7 +4,7 @@ import type { ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ColorValue } from 'react-native';
 
-import { colors, fonts } from '@/theme';
+import { fonts, useTheme } from '@/theme';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -16,6 +16,7 @@ function tabIcon(name: IconName) {
 
 /** The organisation admin's tabs. Employees never see these. */
 export default function AdminTabsLayout() {
+  const { colors } = useTheme();
   const { t } = useTranslation();
 
   return (

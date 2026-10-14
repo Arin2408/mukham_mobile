@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text } from 'react-native';
+import { Text } from 'react-native';
 
 import { requestPasswordReset } from '@/api/auth';
 import { errorMessage } from '@/api/errors';
@@ -9,13 +9,15 @@ import { Button } from '@/components/button';
 import { ErrorBanner } from '@/components/error-banner';
 import { Screen } from '@/components/screen';
 import { TextField } from '@/components/text-field';
-import { text } from '@/theme';
+import { makeStyles } from '@/theme';
+
 
 /**
  * Admins only. The emailed link opens the web app's reset page, which
  * works on any device; the new password then works here too.
  */
 export default function ForgotPasswordScreen() {
+  const styles = useStyles();
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -64,9 +66,9 @@ export default function ForgotPasswordScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ text }) => ({
   body: {
     ...text.body,
     lineHeight: 22,
   },
-});
+}));

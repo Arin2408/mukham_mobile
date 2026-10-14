@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { mediaUrl } from '@/api/config';
@@ -10,7 +10,7 @@ import { Avatar } from '@/components/avatar';
 import { Button } from '@/components/button';
 import { QrCode } from '@/components/qr-code';
 import { StateView } from '@/components/state-view';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 type Props = {
   /** Undefined while the caller is still finding out whose card it is. */
@@ -25,6 +25,8 @@ type Props = {
  * the web app's /verify page. Used by employees (their own card) and admins.
  */
 export function IdCardView({ employeeId, lookupError, onRetryLookup }: Props) {
+  const styles = useStyles();
+  const { text } = useTheme();
   const { t } = useTranslation();
   const card = useQuery({
     queryKey: ['id-card', employeeId],
@@ -71,6 +73,8 @@ export function IdCardView({ employeeId, lookupError, onRetryLookup }: Props) {
 }
 
 function Fact({ label, value }: { label: string; value: string }) {
+  const styles = useStyles();
+  const { text } = useTheme();
   return (
     <View style={styles.fact}>
       <Text style={text.muted}>{label}</Text>
@@ -79,7 +83,7 @@ function Fact({ label, value }: { label: string; value: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -133,4 +137,4 @@ const styles = StyleSheet.create({
   actions: {
     padding: spacing.md,
   },
-});
+}));

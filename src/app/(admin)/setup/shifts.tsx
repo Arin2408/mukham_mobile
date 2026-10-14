@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getDepartments, getOffices, getShifts } from '@/api/setup';
@@ -10,10 +10,11 @@ import { LinkRow } from '@/components/link-row';
 import { StateView } from '@/components/state-view';
 import { formatDuration } from '@/lib/format';
 import { departmentLabel, shiftTimes } from '@/lib/setup-labels';
-import { colors, spacing } from '@/theme';
+import { makeStyles, spacing } from '@/theme';
 
 /** Every shift with its times, department and how many people have it. */
 export default function ShiftsScreen() {
+  const styles = useStyles();
   const { t } = useTranslation();
   const shifts = useQuery({ queryKey: ['admin', 'shifts'], queryFn: getShifts });
   const departments = useQuery({ queryKey: ['admin', 'departments'], queryFn: getDepartments });
@@ -65,7 +66,7 @@ export default function ShiftsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -74,4 +75,4 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     gap: spacing.sm,
   },
-});
+}));

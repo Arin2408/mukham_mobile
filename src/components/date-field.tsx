@@ -1,11 +1,11 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { formatDateShort, parseDateParam } from '@/lib/format';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 import { Button } from './button';
 import { MonthGrid } from './month-grid';
@@ -21,6 +21,8 @@ type Props = {
 
 /** A form field that opens a month calendar to pick a date. */
 export function DateField({ label, value, onChange, clearable }: Props) {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState(() => (value ? parseDateParam(value) : new Date()));
@@ -71,7 +73,7 @@ export function DateField({ label, value, onChange, clearable }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   field: {
     gap: spacing.xs,
   },
@@ -109,4 +111,4 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     gap: spacing.md,
   },
-});
+}));

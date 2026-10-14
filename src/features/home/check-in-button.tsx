@@ -1,10 +1,10 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { Gradient } from '@/components/ui/gradient';
 import { PressableScale, useCycle } from '@/components/ui/motion';
-import { colors, fonts, gradients } from '@/theme';
+import { fonts, makeStyles, useTheme } from '@/theme';
 
 const SIZE = 148;
 
@@ -18,6 +18,8 @@ type Props = {
 
 /** The big round check-in button: brand gradient, with a ring pulsing outward while there's something to do. */
 export function CheckInButton({ label, mode, disabled, onPress }: Props) {
+  const styles = useStyles();
+  const { gradients } = useTheme();
   const pulse = useCycle(2200);
   const ring = useAnimatedStyle(() => ({
     opacity: disabled ? 0 : 0.5 * (1 - pulse.get()),
@@ -45,7 +47,7 @@ export function CheckInButton({ label, mode, disabled, onPress }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   wrap: {
     width: SIZE + 60,
     height: SIZE + 60,
@@ -90,4 +92,4 @@ const styles = StyleSheet.create({
   disabled: {
     opacity: 0.4,
   },
-});
+}));

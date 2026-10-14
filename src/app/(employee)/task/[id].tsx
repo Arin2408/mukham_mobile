@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { errorMessage } from '@/api/errors';
@@ -11,9 +11,10 @@ import { Segmented } from '@/components/segmented';
 import { StateView } from '@/components/state-view';
 import { TaskPills } from '@/features/tasks/task-pills';
 import { formatDate } from '@/lib/format';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 export default function TaskDetailScreen() {
+  const styles = useStyles();
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const taskId = Number(id);
@@ -57,6 +58,8 @@ type BodyProps = {
 };
 
 function TaskBody({ task, onChange, saving, error }: BodyProps) {
+  const styles = useStyles();
+  const { text } = useTheme();
   const { t } = useTranslation();
   const dates: [string, string | null][] = [
     [t('tasks.assigned'), task.assigned_date],
@@ -101,7 +104,7 @@ function TaskBody({ task, onChange, saving, error }: BodyProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -138,4 +141,4 @@ const styles = StyleSheet.create({
   saving: {
     opacity: 0.5,
   },
-});
+}));

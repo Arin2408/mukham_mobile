@@ -1,10 +1,10 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 import { Button } from './button';
 
@@ -20,6 +20,8 @@ type Props = {
 
 /** A form field that opens an hour and minute picker (minutes in 5s, plus the current one). */
 export function TimeField({ label, value, onChange }: Props) {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [hour, setHour] = useState(value.slice(0, 2));
@@ -65,6 +67,7 @@ export function TimeField({ label, value, onChange }: Props) {
 }
 
 function Grid({ items, selected, onSelect }: { items: string[]; selected: string; onSelect: (v: string) => void }) {
+  const styles = useStyles();
   return (
     <View style={styles.grid}>
       {items.map((item) => {
@@ -84,7 +87,7 @@ function Grid({ items, selected, onSelect }: { items: string[]; selected: string
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   field: {
     flex: 1,
     gap: spacing.xs,
@@ -145,4 +148,4 @@ const styles = StyleSheet.create({
   cellTextOn: {
     color: colors.primaryText,
   },
-});
+}));

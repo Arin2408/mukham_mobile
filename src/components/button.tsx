@@ -1,6 +1,6 @@
-import { ActivityIndicator, StyleSheet, Text } from 'react-native';
+import { ActivityIndicator, Text } from 'react-native';
 
-import { colors, fonts, radius, spacing } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 import { PressableScale } from './ui/motion';
 
@@ -13,6 +13,9 @@ type Props = {
 };
 
 export function Button({ label, onPress, variant = 'primary', loading, disabled }: Props) {
+  const styles = useStyles();
+  const labelStyles = useLabelStyles();
+  const { colors } = useTheme();
   const inactive = disabled || loading;
 
   return (
@@ -31,7 +34,7 @@ export function Button({ label, onPress, variant = 'primary', loading, disabled 
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   base: {
     minHeight: 48,
     borderRadius: radius.md,
@@ -53,11 +56,11 @@ const styles = StyleSheet.create({
   link: { minHeight: 40 },
   inactive: { opacity: 0.5 },
   label: { fontFamily: fonts.semibold, fontSize: 16 },
-});
+}));
 
-const labelStyles = StyleSheet.create({
+const useLabelStyles = makeStyles(({ colors }) => ({
   primary: { color: colors.primaryText },
   secondary: { color: colors.text },
   danger: { color: colors.danger },
   link: { color: colors.primary, fontFamily: fonts.medium, fontSize: 15 },
-});
+}));

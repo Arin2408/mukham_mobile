@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { getDashboardSummary } from '@/api/admin';
 import { BarChart } from '@/components/bar-chart';
@@ -11,11 +11,12 @@ import { Card } from '@/components/ui/card';
 import { FadeIn } from '@/components/ui/motion';
 import { StatTile } from '@/components/ui/stat-tile';
 import { parseDateParam } from '@/lib/format';
-import { colors, fonts, spacing, text } from '@/theme';
+import { fonts, makeStyles, spacing, useTheme } from '@/theme';
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export default function AdminDashboardScreen() {
+  const styles = useStyles();
   const { t } = useTranslation();
   const summary = useQuery({ queryKey: ['admin', 'dashboard'], queryFn: getDashboardSummary });
   const s = summary.data;
@@ -72,6 +73,8 @@ export default function AdminDashboardScreen() {
 }
 
 function Section({ index, title, empty, children }: { index: number; title: string; empty: string; children: ReactNode[] }) {
+  const styles = useStyles();
+  const { text } = useTheme();
   return (
     <Card index={index} style={styles.card}>
       <Text style={text.muted}>{title}</Text>
@@ -81,6 +84,8 @@ function Section({ index, title, empty, children }: { index: number; title: stri
 }
 
 function Line({ label, value }: { label: string; value: string }) {
+  const styles = useStyles();
+  const { text } = useTheme();
   return (
     <View style={styles.line}>
       <Text style={[text.body, styles.lineLabel]} numberOfLines={1}>
@@ -91,7 +96,7 @@ function Line({ label, value }: { label: string; value: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   tiles: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -113,4 +118,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text,
   },
-});
+}));

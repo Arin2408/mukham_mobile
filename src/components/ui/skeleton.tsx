@@ -1,12 +1,13 @@
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-import { colors, radius, spacing } from '@/theme';
+import { makeStyles, radius, spacing } from '@/theme';
 
 import { useLoop } from './motion';
 
 /** Placeholder cards that pulse gently while a list loads. */
 export function Skeleton({ rows = 3 }: { rows?: number }) {
+  const styles = useStyles();
   const t = useLoop(1400);
   const pulse = useAnimatedStyle(() => ({ opacity: 0.45 + t.get() * 0.4 }));
   return (
@@ -21,7 +22,7 @@ export function Skeleton({ rows = 3 }: { rows?: number }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   list: {
     gap: spacing.sm,
     paddingVertical: spacing.sm,
@@ -37,7 +38,7 @@ const styles = StyleSheet.create({
   line: {
     height: 12,
     borderRadius: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: colors.subtle,
   },
   wide: {
     width: '60%',
@@ -45,4 +46,4 @@ const styles = StyleSheet.create({
   short: {
     width: '35%',
   },
-});
+}));

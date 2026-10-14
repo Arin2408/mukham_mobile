@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { errorMessage } from '@/api/errors';
@@ -11,12 +11,13 @@ import { Button } from '@/components/button';
 import { ErrorBanner } from '@/components/error-banner';
 import { StateView } from '@/components/state-view';
 import { TextField } from '@/components/text-field';
-import { colors, spacing, text } from '@/theme';
+import { makeStyles, spacing, useTheme } from '@/theme';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** The organisation's name, email (for password resets) and details. */
 export default function OrgProfileScreen() {
+  const styles = useStyles();
   const profile = useQuery({ queryKey: ['admin', 'org-profile'], queryFn: getOrgProfile });
 
   return (
@@ -35,6 +36,8 @@ export default function OrgProfileScreen() {
 type Loaded = Awaited<ReturnType<typeof getOrgProfile>>;
 
 function ProfileForm({ profile }: { profile: Loaded }) {
+  const styles = useStyles();
+  const { text } = useTheme();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [name, setName] = useState(profile.name);
@@ -76,7 +79,7 @@ function ProfileForm({ profile }: { profile: Loaded }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -85,4 +88,4 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     gap: spacing.md,
   },
-});
+}));

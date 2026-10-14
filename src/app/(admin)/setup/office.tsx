@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { errorMessage } from '@/api/errors';
@@ -16,7 +16,7 @@ import { getPosition, PositionError } from '@/features/location/get-position';
 import { OfficeMap, type MapPoint, type OfficeMapHandle } from '@/features/map/office-map';
 import { MAX_RADIUS, MIN_RADIUS, stepRadius } from '@/features/map/radius';
 import { formatDistance } from '@/lib/format';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 const LOCATION_PROBLEM = {
   permission: 'checkIn.permissionBody',
@@ -27,6 +27,7 @@ const LOCATION_PROBLEM = {
 
 /** Add an office (no id) or edit one (?id=): name, pin on the map, check-in radius. */
 export default function OfficeScreen() {
+  const styles = useStyles();
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const officeId = id ? Number(id) : null;
@@ -48,6 +49,8 @@ export default function OfficeScreen() {
 }
 
 function OfficeForm({ existing }: { existing?: Office }) {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const map = useRef<OfficeMapHandle>(null);
@@ -221,7 +224,7 @@ function OfficeForm({ existing }: { existing?: Office }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
@@ -288,4 +291,4 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: colors.text,
   },
-});
+}));

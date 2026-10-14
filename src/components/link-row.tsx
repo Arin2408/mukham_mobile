@@ -1,13 +1,15 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { PressableScale } from '@/components/ui/motion';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 type Props = { title: string; detail?: string; onPress: () => void };
 
 /** A card-like row that opens something: title, a muted line, a chevron. */
 export function LinkRow({ title, detail, onPress }: Props) {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   return (
     <PressableScale onPress={onPress} accessibilityRole="button" style={styles.row}>
       <View style={styles.body}>
@@ -21,7 +23,7 @@ export function LinkRow({ title, detail, onPress }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -44,4 +46,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text,
   },
-});
+}));

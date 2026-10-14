@@ -5,12 +5,13 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { APP_VERSION } from '@/hooks/use-server';
 import { useSession } from '@/store/session';
-import { spacing, text } from '@/theme';
+import { spacing, useTheme } from '@/theme';
 
 import { Button } from './button';
 
 /** Who is signed in, the Sign out button and the app version. */
 export function SignOutSection() {
+  const { text } = useTheme();
   const { t } = useTranslation();
   const role = useSession((s) => s.role);
   const signOut = useSession((s) => s.signOut);

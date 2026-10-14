@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useEffect, useState, type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { getLatestAttendance, getMyProfile, type AttendanceRecord } from '@/api/attendance';
 import { ErrorBanner } from '@/components/error-banner';
@@ -13,7 +13,7 @@ import { Gradient } from '@/components/ui/gradient';
 import { FadeIn } from '@/components/ui/motion';
 import { CheckInButton } from '@/features/home/check-in-button';
 import { formatHours, formatShiftTime, formatTime, isToday } from '@/lib/format';
-import { colors, fonts, gradients, radius, spacing, statBorders, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 /** The clock on Home, updated every 15 seconds. */
 function useNow() {
@@ -38,6 +38,8 @@ function statusOf(latest: AttendanceRecord | null | undefined): Status {
 }
 
 export default function HomeScreen() {
+  const styles = useStyles();
+  const { gradients } = useTheme();
   const { t } = useTranslation();
   const now = useNow();
   const profile = useQuery({ queryKey: ['profile'], queryFn: getMyProfile });
@@ -126,6 +128,8 @@ export default function HomeScreen() {
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
 function InfoCard({ index, icon, label, value }: { index: number; icon: IconName; label: string; value: string }) {
+  const styles = useStyles();
+  const { colors, text } = useTheme();
   return (
     <Card index={index} style={styles.info}>
       <View style={styles.iconTile}>
@@ -137,7 +141,7 @@ function InfoCard({ index, icon, label, value }: { index: number; icon: IconName
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors, text, statBorders }) => ({
   hero: {
     borderRadius: radius.lg,
     borderWidth: 1,
@@ -164,7 +168,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingHorizontal: spacing.md,
     paddingVertical: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    backgroundColor: colors.subtle,
     marginTop: spacing.xs,
   },
   statusIn: {
@@ -212,4 +216,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text,
   },
-});
+}));

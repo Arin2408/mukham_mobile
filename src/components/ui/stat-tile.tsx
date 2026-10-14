@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { Text } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 
-import { colors, fonts, gradients, radius, spacing, statBorders, text } from '@/theme';
+import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 import { Gradient } from './gradient';
 import { FadeIn } from './motion';
@@ -35,6 +35,8 @@ function useCountUp(target: number): number {
 
 /** The web's stat card: a blue or purple tint fading to black, with a count-up number. */
 export function StatTile({ value, suffix = '', label, tone, index = 0 }: Props) {
+  const styles = useStyles();
+  const { text, gradients, statBorders } = useTheme();
   const shown = useCountUp(value);
   return (
     <FadeIn index={index} style={styles.wrap}>
@@ -51,7 +53,7 @@ export function StatTile({ value, suffix = '', label, tone, index = 0 }: Props) 
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(({ colors }) => ({
   wrap: {
     flexBasis: '48%',
     flexGrow: 1,
@@ -68,4 +70,4 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: colors.text,
   },
-});
+}));
