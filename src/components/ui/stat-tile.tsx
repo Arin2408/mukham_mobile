@@ -14,6 +14,8 @@ type Props = {
   label: string;
   tone: 'blue' | 'purple';
   index?: number;
+  /** Four in a row instead of two: a smaller number and label. */
+  compact?: boolean;
 };
 
 /** A number counting up to `target` over 700 ms (straight to it with reduce motion). */
@@ -34,20 +36,26 @@ function useCountUp(target: number): number {
 }
 
 /** The web's stat card: a blue or purple tint fading to black, with a count-up number. */
-export function StatTile({ value, suffix = '', label, tone, index = 0 }: Props) {
+export function StatTile({ value, suffix = '', label, tone, index = 0, compact = false }: Props) {
   const styles = useStyles();
   const { text, gradients, statBorders } = useTheme();
   const shown = useCountUp(value);
   return (
-    <FadeIn index={index} style={styles.wrap}>
+    <FadeIn index={index} style={compact ? styles.wrapCompact : styles.wrap}>
       <Gradient
         colors={tone === 'blue' ? gradients.statBlue : gradients.statPurple}
-        style={[styles.tile, { borderColor: tone === 'blue' ? statBorders.blue : statBorders.purple }]}>
-        <Text style={styles.value} accessibilityLabel={`${value}${suffix}`}>
+        style={[
+          styles.tile,
+          compact && styles.tileCompact,
+          { borderColor: tone === 'blue' ? statBorders.blue : statBorders.purple },
+        ]}>
+        <Text style={compact ? styles.valueCompact : styles.value} accessibilityLabel={`${value}${suffix}`}>
           {shown}
           {suffix}
         </Text>
-        <Text style={text.muted}>{label}</Text>
+        <Text style={[text.muted, compact && styles.labelCompact]} numberOfLines={2}>
+          {label}
+        </Text>
       </Gradient>
     </FadeIn>
   );
@@ -69,5 +77,22 @@ const useStyles = makeStyles(({ colors }) => ({
     fontFamily: fonts.bold,
     fontSize: 28,
     color: colors.text,
+  },
+  wrapCompact: {
+    flex: 1,
+  },
+  tileCompact: {
+    flex: 1,
+    padding: spacing.sm,
+    borderRadius: radius.md,
+  },
+  valueCompact: {
+    fontFamily: fonts.bold,
+    fontSize: 20,
+    color: colors.text,
+  },
+  labelCompact: {
+    fontSize: 11,
+    lineHeight: 14,
   },
 }));

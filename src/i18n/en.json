@@ -189,7 +189,15 @@
     "employeeId": "Employee ID",
     "department": "Department",
     "scan": "Scan to verify",
-    "close": "Close"
+    "close": "Close",
+    "designation": "Designation",
+    "active": "Active",
+    "flip": "Flip",
+    "front": "Front",
+    "scanHint": "Opens the employee's verification page",
+    "note": "This card belongs to {{organisation}}. If found, please return it to the office.",
+    "validatedBy": "Validated by",
+    "yourOrganisation": "your organisation"
   },
   "states": {
     "loading": "Loading",
@@ -286,7 +294,18 @@
     "changeManager": "Change manager",
     "openProfile": "Open profile",
     "whoManages": "Who does {{name}} report to?",
-    "changeFailed": "Couldn't change the manager"
+    "changeFailed": "Couldn't change the manager",
+    "statEmployees": "Employees",
+    "statTop": "Report to admin",
+    "statManagers": "Managers",
+    "statLevels": "Levels",
+    "search": "Search name, designation or department",
+    "allDepartments": "All departments",
+    "expandAll": "Expand all",
+    "collapseAll": "Collapse all",
+    "noDesignation": "No designation",
+    "hintTeam": "Shows or hides their team. Hold for more.",
+    "hintMenu": "Opens the options for this person."
   },
   "adminTasks": {
     "assign": "Assign task",

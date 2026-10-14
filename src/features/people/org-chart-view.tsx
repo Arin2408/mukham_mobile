@@ -1,60 +1,70 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, FlatList, Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, FlatList, Pressable, Text, TextInput, View } from 'react-native';
 
 import { errorMessage } from '@/api/errors';
 import { getHierarchy, setManager, type HierarchyPerson } from '@/api/people';
+import { getDepartments, getOffices } from '@/api/setup';
 import { OptionSheet } from '@/components/picker-field';
 import { StateView } from '@/components/state-view';
-import { Gradient } from '@/components/ui/gradient';
 import { FadeIn, PressableScale } from '@/components/ui/motion';
 import { PersonAvatar } from '@/components/ui/person-avatar';
+import { StatTile } from '@/components/ui/stat-tile';
+import { departmentLabel } from '@/lib/setup-labels';
 import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
-const fullName = (p: HierarchyPerson) => `${p.first_name} ${p.last_name}`.trim();
+import { allManagers, buildChildren, fullName, treeStats, visibleRows, type TreeRow } from './org-tree';
+
+const INDENT = 20;
+/** Deeper levels stop indenting further, so names never get squeezed off a phone screen. */
+const MAX_INDENT_LEVELS = 6;
 
 /**
- * People › Org chart, one level at a time: the people who report to the
- * organisation, then to whoever you tap. Readable with hundreds of people.
+ * People › Org chart, as on the web: totals, search, a department filter,
+ * and the reporting tree with teams that open and close.
  */
 export function OrgChartView() {
   const styles = useStyles();
-  const { colors, text, gradients } = useTheme();
+  const { colors } = useTheme();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const hierarchy = useQuery({ queryKey: ['admin', 'hierarchy'], queryFn: getHierarchy });
-  // The people tapped so far, top first; empty = the organisation.
-  const [path, setPath] = useState<number[]>([]);
-  const [moving, setMoving] = useState<HierarchyPerson | null>(null);
+  const departments = useQuery({ queryKey: ['admin', 'departments'], queryFn: getDepartments });
+  const offices = useQuery({ queryKey: ['admin', 'offices'], queryFn: getOffices });
 
   const people = hierarchy.data?.employees;
-  const byId = useMemo(() => new Map((people ?? []).map((p) => [p.employee_id, p])), [people]);
-  // People whose manager has gone (or isn't in the list) show at the top.
-  const reportsTo = useMemo(() => {
-    const map = new Map<number | null, HierarchyPerson[]>();
-    for (const p of people ?? []) {
-      const key = p.manager_id != null && byId.has(p.manager_id) ? p.manager_id : null;
-      map.set(key, [...(map.get(key) ?? []), p]);
-    }
-    for (const list of map.values()) list.sort((a, b) => fullName(a).localeCompare(fullName(b)));
-    return map;
-  }, [people, byId]);
+  const children = useMemo(() => buildChildren(people ?? []), [people]);
+  const stats = useMemo(() => treeStats(children, people?.length ?? 0), [children, people]);
 
-  // Drop anyone from the path who has been removed since.
-  const trail = path.filter((id) => byId.has(id));
-  const currentId = trail.at(-1) ?? null;
-  const current = currentId != null ? byId.get(currentId) : undefined;
-  const rows = reportsTo.get(currentId) ?? [];
+  // Teams open at first: the people who report to the organisation.
+  const [expanded, setExpanded] = useState<Set<number> | null>(null);
+  const open = useMemo(
+    () =>
+      expanded ??
+      new Set((children.get(null) ?? []).filter((p) => (children.get(p.employee_id) ?? []).length).map((p) => p.employee_id)),
+    [expanded, children],
+  );
+  const [query, setQuery] = useState('');
+  const [department, setDepartment] = useState<number | null>(null);
+  const [pickingDepartment, setPickingDepartment] = useState(false);
+  const [moving, setMoving] = useState<HierarchyPerson | null>(null);
+
+  const rows = useMemo(() => visibleRows(children, open, query), [children, open, query]);
+
+  const toggle = (id: number) => {
+    const next = new Set(open);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setExpanded(next);
+  };
 
   const change = useMutation({
     mutationFn: ({ person, managerId }: { person: HierarchyPerson; managerId: number | null }) =>
       setManager(person.employee_id, managerId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin'] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin'] }),
     onError: (error) => Alert.alert(t('org.changeFailed'), errorMessage(error, t)),
   });
 
@@ -68,120 +78,121 @@ export function OrgChartView() {
       { text: t('checkIn.cancel'), style: 'cancel' },
     ]);
 
-  if (hierarchy.isPending) return <StateView kind="loading" />;
-  if (hierarchy.isError) {
-    return <StateView kind="error" error={hierarchy.error} onRetry={() => hierarchy.refetch()} />;
+  if (hierarchy.isPending || hierarchy.isError) {
+    return (
+      <View style={styles.list}>
+        {hierarchy.isPending ? (
+          <StateView kind="loading" />
+        ) : (
+          <StateView kind="error" error={hierarchy.error} onRetry={() => hierarchy.refetch()} />
+        )}
+      </View>
+    );
   }
 
-  const managerChoices = moving
-    ? (people ?? [])
-        .filter((p) => p.employee_id !== moving.employee_id)
-        .map((p) => ({ id: p.employee_id, name: fullName(p) }))
-        .sort((a, b) => a.name.localeCompare(b.name))
-    : [];
+  const departmentOptions = (departments.data ?? []).map((d) => ({
+    id: d.department_id,
+    name: departmentLabel(d, offices.data ?? []),
+  }));
+  const departmentName = departmentOptions.find((d) => d.id === department)?.name;
 
-  const headName = current ? fullName(current) : hierarchy.data.organisation_name;
+  // Anyone but the person and their own team can be their manager (no loops).
+  const managerChoices = moving ? candidateManagers(moving, children, people ?? []) : [];
 
   return (
     <View style={styles.fill}>
-      {/* The path: tap any step to go back up. */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.crumbs}>
-        <Pressable
-          onPress={() => setPath([])}
-          accessibilityRole="button"
-          hitSlop={6}
-          style={[styles.chip, trail.length === 0 && styles.chipHere]}>
-          <Ionicons name="business-outline" size={13} color={trail.length === 0 ? colors.primaryText : colors.textMuted} />
-          <Text style={[styles.chipText, trail.length === 0 && styles.chipTextHere]}>{hierarchy.data.organisation_name}</Text>
-        </Pressable>
-        {trail.map((id, i) => {
-          const here = i === trail.length - 1;
-          return (
-            <View key={id} style={styles.crumbItem}>
-              <Ionicons name="chevron-forward" size={14} color={colors.textMuted} />
-              <Pressable
-                onPress={() => setPath(trail.slice(0, i + 1))}
-                accessibilityRole="button"
-                hitSlop={6}
-                style={[styles.chip, here && styles.chipHere]}>
-                <Text style={[styles.chipText, here && styles.chipTextHere]}>{fullName(byId.get(id)!)}</Text>
-              </Pressable>
-            </View>
-          );
-        })}
-      </ScrollView>
-
       <FlatList
         data={rows}
-        keyExtractor={(p) => String(p.employee_id)}
+        keyExtractor={(r) => String(r.person.employee_id)}
         contentContainerStyle={styles.list}
         refreshing={hierarchy.isRefetching}
         onRefresh={() => hierarchy.refetch()}
+        initialNumToRender={20}
+        windowSize={9}
+        keyboardShouldPersistTaps="handled"
         ListHeaderComponent={
-          <FadeIn>
-            <Gradient colors={gradients.statBlue} style={styles.head}>
-              {current ? (
-                <PersonAvatar name={headName} photo={current.photo} size={56} />
-              ) : (
-                <View style={styles.orgIcon}>
-                  <Ionicons name="business" size={26} color={colors.primaryText} />
-                </View>
-              )}
-              <View style={styles.headBody}>
-                <Text style={styles.headName} numberOfLines={1}>
-                  {headName}
+          <View style={styles.header}>
+            <View style={styles.tiles}>
+              <StatTile compact index={0} tone="blue" value={stats.total} label={t('org.statEmployees')} />
+              <StatTile compact index={1} tone="purple" value={stats.topLevel} label={t('org.statTop')} />
+              <StatTile compact index={2} tone="purple" value={stats.managers} label={t('org.statManagers')} />
+              <StatTile compact index={3} tone="blue" value={stats.levels} label={t('org.statLevels')} />
+            </View>
+
+            <FadeIn index={4} style={styles.search}>
+              <Ionicons name="search" size={18} color={colors.textMuted} />
+              <TextInput
+                value={query}
+                onChangeText={setQuery}
+                placeholder={t('org.search')}
+                placeholderTextColor={colors.textMuted}
+                accessibilityLabel={t('org.search')}
+                autoCorrect={false}
+                style={styles.searchInput}
+              />
+            </FadeIn>
+
+            <FadeIn index={5} style={styles.toolbar}>
+              <Pressable
+                onPress={() => setPickingDepartment(true)}
+                accessibilityRole="button"
+                style={[styles.filter, department != null && styles.filterOn]}>
+                <Ionicons
+                  name="funnel-outline"
+                  size={14}
+                  color={department != null ? colors.primaryText : colors.textMuted}
+                />
+                <Text style={[styles.filterText, department != null && styles.filterTextOn]} numberOfLines={1}>
+                  {departmentName ?? t('org.allDepartments')}
                 </Text>
-                {current?.designation_name ? <Text style={text.muted}>{current.designation_name}</Text> : null}
-                <View style={styles.badge}>
-                  <Ionicons name="people" size={13} color={colors.infoText} />
-                  <Text style={styles.badgeText}>
-                    {current ? t('org.reports', { count: rows.length }) : t('org.topLevel', { count: rows.length })}
-                  </Text>
-                </View>
+              </Pressable>
+              <View style={styles.grow} />
+              <Pressable onPress={() => setExpanded(allManagers(children))} accessibilityRole="button" hitSlop={6}>
+                <Text style={styles.link}>{t('org.expandAll')}</Text>
+              </Pressable>
+              <Pressable onPress={() => setExpanded(new Set())} accessibilityRole="button" hitSlop={6}>
+                <Text style={styles.link}>{t('org.collapseAll')}</Text>
+              </Pressable>
+            </FadeIn>
+
+            {/* The organisation: the root every chain starts from. */}
+            <FadeIn index={6} style={styles.root}>
+              <View style={styles.rootIcon}>
+                <Ionicons name="business" size={18} color={colors.primaryText} />
               </View>
-            </Gradient>
-            {rows.length ? <View style={styles.stem} /> : null}
-          </FadeIn>
+              <View style={styles.grow}>
+                <Text style={styles.rootName} numberOfLines={1}>
+                  {hierarchy.data.organisation_name}
+                </Text>
+                <Text style={styles.meta}>{t('org.topLevel', { count: stats.topLevel })}</Text>
+              </View>
+            </FadeIn>
+          </View>
         }
         ListEmptyComponent={
-          <StateView kind="empty" message={current ? t('org.noReports', { name: fullName(current) }) : t('people.empty')} />
+          <StateView kind="empty" message={query.trim() ? t('attendance.noMatch') : t('people.empty')} />
         }
-        renderItem={({ item, index }) => (
-          <FadeIn index={index + 1} style={styles.branch}>
-            {/* The connector: a line down the left, a tick to each person. */}
-            <View style={[styles.rail, index === rows.length - 1 && styles.railLast]} />
-            <View style={styles.tick} />
-            <PressableScale
-              onPress={() => setPath([...trail, item.employee_id])}
-              onLongPress={() => actions(item)}
-              accessibilityRole="button"
-              accessibilityHint={t('org.hint')}
-              style={styles.row}>
-              <PersonAvatar name={fullName(item)} photo={item.photo} />
-              <View style={styles.body}>
-                <Text style={styles.name} numberOfLines={1}>
-                  {fullName(item)}
-                </Text>
-                <Text style={text.muted} numberOfLines={1}>
-                  {[item.designation_name, item.department_name].filter(Boolean).join(' · ') || ' '}
-                </Text>
-              </View>
-              {item.direct_reports ? (
-                <View style={styles.count} accessibilityLabel={t('org.reports', { count: item.direct_reports })}>
-                  <Ionicons name="people-outline" size={12} color={colors.infoText} />
-                  <Text style={styles.countText}>{item.direct_reports}</Text>
-                </View>
-              ) : null}
-              <Pressable
-                onPress={() => actions(item)}
-                accessibilityRole="button"
-                accessibilityLabel={t('org.more', { name: fullName(item) })}
-                hitSlop={10}>
-                <Ionicons name="ellipsis-vertical" size={18} color={colors.textMuted} />
-              </Pressable>
-            </PressableScale>
-          </FadeIn>
+        renderItem={({ item }) => (
+          <TreeNode
+            row={item}
+            dimmed={department != null && item.person.department_id !== department}
+            onToggle={toggle}
+            onMenu={actions}
+          />
         )}
+      />
+
+      <OptionSheet
+        visible={pickingDepartment}
+        title={t('profile.department')}
+        options={departmentOptions}
+        value={department}
+        noneLabel={t('org.allDepartments')}
+        onChoose={(id) => {
+          setDepartment(id);
+          setPickingDepartment(false);
+        }}
+        onClose={() => setPickingDepartment(false)}
       />
 
       <OptionSheet
@@ -201,151 +212,259 @@ export function OrgChartView() {
   );
 }
 
-const RAIL_X = 22;
+/** Everyone except the person and the people below them: picking those would make a loop. */
+function candidateManagers(
+  person: HierarchyPerson,
+  children: Map<number | null, HierarchyPerson[]>,
+  people: HierarchyPerson[],
+) {
+  const below = new Set<number>();
+  const stack = [...(children.get(person.employee_id) ?? [])];
+  while (stack.length) {
+    const p = stack.pop()!;
+    if (below.has(p.employee_id)) continue;
+    below.add(p.employee_id);
+    stack.push(...(children.get(p.employee_id) ?? []));
+  }
+  return people
+    .filter((p) => p.employee_id !== person.employee_id && !below.has(p.employee_id))
+    .map((p) => ({ id: p.employee_id, name: fullName(p) }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
 
-const useStyles = makeStyles(({ colors, text, statBorders }) => ({
+type NodeProps = {
+  row: TreeRow;
+  dimmed: boolean;
+  onToggle: (id: number) => void;
+  onMenu: (person: HierarchyPerson) => void;
+};
+
+/** One person in the tree: connector lines, then their card. */
+const TreeNode = memo(function TreeNode({ row, dimmed, onToggle, onMenu }: NodeProps) {
+  const styles = useStyles();
+  const { colors } = useTheme();
+  const { t } = useTranslation();
+  const { person, reports, open } = row;
+  const depth = Math.min(row.depth, MAX_INDENT_LEVELS);
+  const rails = row.rails.slice(0, depth);
+  const name = fullName(person);
+  const role = [person.designation_name ?? t('org.noDesignation'), person.department_name]
+    .filter(Boolean)
+    .join(' · ');
+
+  return (
+    <View style={[styles.node, dimmed && styles.dimmed]}>
+      {/* Lines down from the managers above, then an elbow into this card. */}
+      <View style={{ width: (depth + 1) * INDENT }}>
+        {rails.map((continues, i) =>
+          continues ? <View key={i} style={[styles.rail, { left: i * INDENT + INDENT / 2 }]} /> : null,
+        )}
+        <View style={[styles.rail, { left: depth * INDENT + INDENT / 2 }, row.last && styles.railHalf]} />
+        <View style={[styles.elbow, { left: depth * INDENT + INDENT / 2 }]} />
+      </View>
+
+      <PressableScale
+        onPress={() => (reports ? onToggle(person.employee_id) : onMenu(person))}
+        onLongPress={() => onMenu(person)}
+        accessibilityRole="button"
+        accessibilityLabel={name}
+        accessibilityHint={reports ? t('org.hintTeam') : t('org.hintMenu')}
+        accessibilityState={reports ? { expanded: open } : undefined}
+        style={[styles.card, row.match && styles.cardMatch]}>
+        {/* A spacer, not a see-through icon: Android can paint "transparent" text after a theme change. */}
+        {reports ? (
+          <Ionicons name={open ? 'chevron-down' : 'chevron-forward'} size={16} color={colors.textMuted} />
+        ) : (
+          <View style={styles.chevronSpace} />
+        )}
+        <PersonAvatar name={name} photo={person.photo} size={36} />
+        <View style={styles.grow}>
+          <Text style={styles.name} numberOfLines={1}>
+            {name}
+          </Text>
+          <Text style={styles.meta} numberOfLines={1}>
+            {role}
+          </Text>
+        </View>
+        {reports ? (
+          <View style={styles.count} accessibilityLabel={t('org.reports', { count: reports })}>
+            <Ionicons name="people-outline" size={12} color={colors.textMuted} />
+            <Text style={styles.countText}>{reports}</Text>
+          </View>
+        ) : null}
+        <Pressable
+          onPress={() => onMenu(person)}
+          accessibilityRole="button"
+          accessibilityLabel={t('org.more', { name })}
+          hitSlop={10}>
+          <Ionicons name="ellipsis-vertical" size={16} color={colors.textMuted} />
+        </Pressable>
+      </PressableScale>
+    </View>
+  );
+});
+
+const useStyles = makeStyles(({ colors }) => ({
   fill: {
     flex: 1,
-  },
-  crumbs: {
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.md,
-    gap: spacing.xs,
-  },
-  crumbItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    backgroundColor: colors.card,
-  },
-  chipHere: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  chipText: {
-    fontFamily: fonts.medium,
-    fontSize: 13,
-    color: colors.textMuted,
-  },
-  chipTextHere: {
-    color: colors.primaryText,
   },
   list: {
     padding: spacing.md,
     paddingTop: 0,
+    paddingBottom: spacing.xl,
   },
-  head: {
+  header: {
+    gap: spacing.md,
+    marginBottom: spacing.xs,
+  },
+  chevronSpace: {
+    width: 16,
+  },
+  tiles: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  search: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    minHeight: 46,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    borderRadius: radius.md,
+    backgroundColor: colors.cardRaised,
+    paddingHorizontal: spacing.md,
+  },
+  searchInput: {
+    flex: 1,
+    fontFamily: fonts.regular,
+    fontSize: 15,
+    color: colors.text,
+    paddingVertical: spacing.sm,
+  },
+  toolbar: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: statBorders.blue,
-    padding: spacing.md,
-    overflow: 'hidden',
   },
-  orgIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
+  filter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    maxWidth: '55%',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    backgroundColor: colors.card,
+  },
+  filterOn: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  filterText: {
+    fontFamily: fonts.medium,
+    fontSize: 13,
+    color: colors.textMuted,
+  },
+  filterTextOn: {
+    color: colors.primaryText,
+  },
+  link: {
+    fontFamily: fonts.semibold,
+    fontSize: 13,
+    color: colors.infoText,
+  },
+  root: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: radius.md,
+    backgroundColor: colors.primarySoft,
+    padding: spacing.md,
+  },
+  rootIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headBody: {
-    flex: 1,
-    gap: 2,
+  rootName: {
+    fontFamily: fonts.semibold,
+    fontSize: 15,
+    color: colors.text,
   },
-  headName: {
-    ...text.heading,
-  },
-  badge: {
+  node: {
     flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    gap: 5,
-    marginTop: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 999,
-    backgroundColor: colors.primarySoft,
   },
-  badgeText: {
-    fontFamily: fonts.medium,
-    fontSize: 12,
-    color: colors.infoText,
-  },
-  stem: {
-    marginLeft: RAIL_X,
-    width: 2,
-    height: spacing.md,
-    backgroundColor: colors.cardBorder,
-  },
-  branch: {
-    paddingLeft: RAIL_X + 18,
-    paddingBottom: spacing.sm,
+  dimmed: {
+    opacity: 0.35,
   },
   rail: {
     position: 'absolute',
-    left: RAIL_X,
     top: 0,
     bottom: 0,
-    width: 2,
+    width: 1.5,
     backgroundColor: colors.cardBorder,
   },
-  railLast: {
-    bottom: '55%',
+  railHalf: {
+    bottom: '50%',
   },
-  tick: {
+  elbow: {
     position: 'absolute',
-    left: RAIL_X,
-    top: '45%',
-    width: 18,
-    height: 2,
+    top: '50%',
+    right: 0,
+    height: 1.5,
     backgroundColor: colors.cardBorder,
   },
-  row: {
+  card: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md,
-    backgroundColor: colors.card,
-    borderColor: colors.cardBorder,
+    gap: spacing.sm,
+    marginVertical: 5,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 10,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderRadius: radius.lg,
-    padding: spacing.md,
+    borderColor: colors.cardBorder,
+    backgroundColor: colors.card,
   },
-  body: {
+  cardMatch: {
+    borderColor: colors.primary,
+    borderWidth: 2,
+  },
+  grow: {
     flex: 1,
-    gap: 2,
   },
   name: {
     fontFamily: fonts.semibold,
-    fontSize: 16,
+    fontSize: 14,
     color: colors.text,
+  },
+  meta: {
+    fontFamily: fonts.regular,
+    fontSize: 12,
+    color: colors.textMuted,
   },
   count: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    gap: 3,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
     borderRadius: 999,
-    backgroundColor: colors.primarySoft,
+    backgroundColor: colors.subtle,
   },
   countText: {
     fontFamily: fonts.semibold,
     fontSize: 12,
-    color: colors.infoText,
+    color: colors.textMuted,
   },
 }));

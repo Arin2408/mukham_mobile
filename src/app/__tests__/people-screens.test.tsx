@@ -47,6 +47,10 @@ jest.mock('@/api/people', () => ({
   getHierarchy: () => mock.getHierarchy(),
   setManager: (...a: unknown[]) => mock.setManager(...a),
 }));
+jest.mock('@/api/setup', () => ({
+  getDepartments: async () => [{ department_id: 1, details: 'Sales', location_id: 1 }],
+  getOffices: async () => [{ location_id: 1, location_name: 'HQ' }],
+}));
 jest.mock('@/api/tasks', () => ({
   getTask: (id: number) => mock.getTask(id),
   createTask: (i: unknown) => mock.createTask(i),
@@ -208,28 +212,48 @@ describe('the org chart', () => {
     });
   });
 
-  it('opens one level at a time and goes back up through the path', async () => {
+  it("shows the totals and the tree, and opens and closes a team", async () => {
     await show(<OrgChartView />);
-    expect(await screen.findByText('1 person reports to the organisation')).toBeTruthy();
+    expect(await screen.findByText('Acme')).toBeTruthy();
+    expect(screen.getByText('1 person reports to the organisation')).toBeTruthy();
+    expect(screen.getByText('Report to admin')).toBeTruthy();
+    // The top level's teams start open.
+    expect(screen.getByText('Ravi Sharma')).toBeTruthy();
+
+    await fireEvent.press(screen.getByLabelText('Meena Iyer'));
     expect(screen.queryByText('Ravi Sharma')).toBeNull();
 
-    await fireEvent.press(screen.getByText('Meena Iyer'));
+    await fireEvent.press(screen.getByText('Expand all'));
     expect(screen.getByText('Ravi Sharma')).toBeTruthy();
-    expect(screen.getByText('Neha Joshi')).toBeTruthy();
+    await fireEvent.press(screen.getByText('Collapse all'));
+    expect(screen.queryByText('Neha Joshi')).toBeNull();
+  });
 
-    await fireEvent.press(screen.getByText('Acme'));
+  it('searches, keeping the managers above a match in view', async () => {
+    await show(<OrgChartView />);
+    await screen.findByText('Acme');
+    await fireEvent.press(screen.getByText('Collapse all'));
+
+    await fireEvent.changeText(screen.getByLabelText('Search name, designation or department'), 'neha');
+    expect(screen.getByText('Neha Joshi')).toBeTruthy();
+    expect(screen.getByText('Meena Iyer')).toBeTruthy();
     expect(screen.queryByText('Ravi Sharma')).toBeNull();
   });
 
-  it('changes a manager from the person menu', async () => {
+  it('changes a manager from the person menu, never offering their own team', async () => {
     pressAlertButton('Change manager');
     mock.setManager.mockResolvedValue({});
     await show(<OrgChartView />);
-    await fireEvent.press(await screen.findByText('Meena Iyer'));
+    await screen.findByText('Ravi Sharma');
+
+    await fireEvent.press(screen.getByLabelText('More for Meena Iyer'));
+    expect(screen.getByText('Who does Meena Iyer report to?')).toBeTruthy();
+    // Ravi reports to Meena, so he can't become her manager.
+    expect(screen.getAllByText('Ravi Sharma')).toHaveLength(1);
+    await fireEvent.press(screen.getAllByText('Acme').at(-1)!); // the sheet's option
+    expect(mock.setManager).not.toHaveBeenCalled(); // already at the top
 
     await fireEvent.press(screen.getByLabelText('More for Ravi Sharma'));
-    expect(screen.getByText('Who does Ravi Sharma report to?')).toBeTruthy();
-    // Move Ravi to report to Neha.
     await fireEvent.press(screen.getAllByText('Neha Joshi').at(-1)!);
     await waitFor(() => expect(mock.setManager).toHaveBeenCalledWith(4, 5));
   });

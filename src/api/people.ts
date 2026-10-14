@@ -42,6 +42,7 @@ export type HierarchyPerson = {
   first_name: string;
   last_name: string;
   designation_name: string | null;
+  department_id: number | null;
   department_name: string | null;
   photo: string | null;
   manager_id: number | null;

@@ -176,12 +176,15 @@ describe('Tasks', () => {
 });
 
 describe('ID card', () => {
-  it('shows the card and a QR code', async () => {
+  it('shows the front, and the QR code after Flip', async () => {
     await show(<IdCardScreen />);
     expect(await screen.findByText('Asha Rao')).toBeTruthy();
     expect(screen.getByText('#42')).toBeTruthy();
-    expect(screen.getByText('Acme')).toBeTruthy();
+    expect(screen.getByText('Active')).toBeTruthy();
+
+    await fireEvent.press(screen.getByText('Flip'));
     expect(screen.getByText('Scan to verify')).toBeTruthy();
+    expect(screen.getByText('Acme')).toBeTruthy(); // Validated by
     expect(screen.getByLabelText('QR code: https://app.mukham.test/verify/42')).toBeTruthy();
   });
 });
