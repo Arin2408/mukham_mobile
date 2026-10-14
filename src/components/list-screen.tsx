@@ -15,6 +15,8 @@ type Props<T> = {
   empty?: ReactElement | null;
   refreshing?: boolean;
   onRefresh?: () => void;
+  /** Extra space under the last row, e.g. for a floating button. */
+  bottomSpace?: number;
 };
 
 /**
@@ -48,6 +50,7 @@ export function ListScreenBody<T>({
   empty,
   refreshing,
   onRefresh,
+  bottomSpace = 0,
 }: Omit<Props<T>, 'title'>) {
   return (
     <FlatList
@@ -55,7 +58,7 @@ export function ListScreenBody<T>({
       data={data}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={[styles.content, bottomSpace ? { paddingBottom: bottomSpace } : null]}
       ItemSeparatorComponent={Separator}
       ListHeaderComponent={header ? <View style={styles.header}>{header}</View> : null}
       ListEmptyComponent={empty}

@@ -131,3 +131,18 @@ export function dayStatus(
 export function daysAgo(days: number, now: Date = new Date()): string {
   return toDateParam(new Date(now.getFullYear(), now.getMonth(), now.getDate() - days));
 }
+
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+/** "October 2026". */
+export function formatMonth(date: Date): string {
+  return `${MONTH_NAMES[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+/** "Tue, 13 Oct" for a date such as "2026-10-13". */
+export function formatDateShort(value: string): string {
+  return formatDay(parseDateParam(value).toISOString());
+}

@@ -149,7 +149,6 @@
     "attendance": "Attendance",
     "people": "People",
     "setup": "Setup",
-    "peoplePlaceholder": "Employees, the org chart and tasks arrive in Phase 6.",
     "setupPlaceholder": "Departments, designations, shifts, office locations and the organisation profile arrive in Phase 7."
   },
   "account": {
@@ -229,5 +228,84 @@
     "confirmBody": "This records the current time and marks it as added by admin.",
     "manualNote": "Uses the current time and is marked \"Added by admin\".",
     "lastDays": "Last {{days}} days"
+  },
+  "form": {
+    "choose": "Choose…",
+    "search": "Search",
+    "noMatch": "Nothing matches.",
+    "close": "Close",
+    "noDate": "No date"
+  },
+  "people": {
+    "employees": "Employees",
+    "orgChart": "Org chart",
+    "tasks": "Tasks",
+    "search": "Search name, mobile, department",
+    "count_one": "{{count}} employee",
+    "count_other": "{{count}} employees",
+    "export": "Export CSV",
+    "exporting": "Preparing…",
+    "exportTitle": "Share the employee list",
+    "exportFailed": "Couldn't export",
+    "exportUnavailable": "This version of the app can't share files. Install the latest Mukham app build, then try again.",
+    "empty": "No employees yet. Tap Add to add the first one.",
+    "add": "Add",
+    "notSignedIn": "Not signed in yet",
+    "noRole": "No department or designation"
+  },
+  "person": {
+    "edit": "Edit",
+    "remove": "Remove employee",
+    "reportsTo": "Reports to",
+    "organisation": "The organisation",
+    "removeTitle": "Remove {{name}}?",
+    "removeBody": "They can no longer sign in. Anyone who reports to them moves up to their manager.",
+    "gone": "This employee has been removed.",
+    "addTitle": "Add employee",
+    "editTitle": "Edit employee",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "none": "None",
+    "save": "Save",
+    "invalid": {
+      "name": "Enter a first name.",
+      "mobile": "Enter a valid 10-digit mobile number.",
+      "email": "Enter a valid email address."
+    },
+    "addedTitle": "Employee added",
+    "addedBody": "{{name}} signs in with mobile number {{mobile}} and the password {{password}}. Pass it on now: it is shown only once. Their first sign-in saves their face.",
+    "passwordNote": "After saving, you'll see their first password once, to pass on to them."
+  },
+  "org": {
+    "reports_one": "{{count}} report",
+    "reports_other": "{{count}} reports",
+    "topLevel_one": "{{count}} person reports to the organisation",
+    "topLevel_other": "{{count}} people report to the organisation",
+    "noReports": "No one reports to {{name}}.",
+    "hint": "Shows who reports to this person. Hold for more.",
+    "more": "More for {{name}}",
+    "changeManager": "Change manager",
+    "openProfile": "Open profile",
+    "whoManages": "Who does {{name}} report to?",
+    "changeFailed": "Couldn't change the manager"
+  },
+  "adminTasks": {
+    "assign": "Assign task",
+    "editTitle": "Edit task",
+    "noneOnDay": "No tasks on this day.",
+    "employee": "Employee",
+    "title": "Title",
+    "description": "Description (optional)",
+    "priority": "Priority",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "delete": "Delete task",
+    "deleteTitle": "Delete this task?",
+    "invalid": {
+      "employee": "Choose who the task is for.",
+      "title": "Enter a title.",
+      "due": "The due date can't be before the assigned date."
+    }
   }
 }
