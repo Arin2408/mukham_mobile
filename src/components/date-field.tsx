@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.cardBorder,
     borderRadius: radius.md,
-    backgroundColor: colors.card,
+    backgroundColor: colors.cardRaised,
     paddingHorizontal: spacing.md,
   },
   value: {

@@ -1,11 +1,13 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { ApiError, errorMessage } from '@/api/errors';
 import { colors, fonts, spacing, text } from '@/theme';
 
 import { Button } from './button';
+import { Skeleton } from './ui/skeleton';
+import { FadeIn } from './ui/motion';
 
 type Props =
   | { kind: 'loading' }
@@ -17,19 +19,15 @@ export function StateView(props: Props) {
   const { t } = useTranslation();
 
   if (props.kind === 'loading') {
-    return (
-      <View style={styles.box} accessibilityLabel={t('states.loading')}>
-        <ActivityIndicator color={colors.primary} />
-      </View>
-    );
+    return <Skeleton />;
   }
 
   if (props.kind === 'empty') {
     return (
-      <View style={styles.box}>
+      <FadeIn style={styles.box}>
         <Ionicons name="file-tray-outline" size={36} color={colors.textMuted} />
         <Text style={styles.message}>{props.message}</Text>
-      </View>
+      </FadeIn>
     );
   }
 

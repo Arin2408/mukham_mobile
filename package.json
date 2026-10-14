@@ -6,6 +6,7 @@
     "@expo-google-fonts/archivo": "^0.4.2",
     "@expo/ui": "~57.0.23",
     "@expo/vector-icons": "^15.0.2",
+    "@react-native-masked-view/masked-view": "0.3.2",
     "@tanstack/react-query": "^5.104.2",
     "expo": "~57.0.28",
     "expo-application": "~57.0.3",
@@ -17,6 +18,7 @@
     "expo-font": "~57.0.4",
     "expo-glass-effect": "~57.0.4",
     "expo-image": "~57.0.5",
+    "expo-linear-gradient": "~57.0.2",
     "expo-linking": "~57.0.12",
     "expo-localization": "~57.0.2",
     "expo-location": "~57.0.21",
@@ -69,6 +71,9 @@
   "private": true,
   "jest": {
     "preset": "jest-expo",
+    "setupFiles": [
+      "<rootDir>/jest.setup.js"
+    ],
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1"
     }

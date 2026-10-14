@@ -3,12 +3,13 @@ import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { getOrgEmployees, getOrgHistory, type OrgEmployee, type OrgRecord } from '@/api/admin';
 import { ListScreen } from '@/components/list-screen';
 import { StateView } from '@/components/state-view';
 import { daysAgo, dayStatus, formatHours, formatTime, type DayStatus } from '@/lib/format';
+import { PressableScale } from '@/components/ui/motion';
 import { colors, fonts, radius, spacing, text } from '@/theme';
 
 type Row = { employee: OrgEmployee; status: DayStatus };
@@ -112,10 +113,10 @@ const EmployeeRow = memo(function EmployeeRow({ row }: { row: Row }) {
         : t('attendance.notIn');
 
   return (
-    <Pressable
+    <PressableScale
       onPress={() => router.push({ pathname: '/employee/[id]', params: { id: String(e.employee_id) } })}
       accessibilityRole="button"
-      style={({ pressed }) => [styles.row, pressed && styles.pressed]}>
+      style={styles.row}>
       <View style={styles.body}>
         <Text style={styles.name} numberOfLines={1}>
           {`${e.first_name} ${e.last_name}`.trim()}
@@ -125,7 +126,7 @@ const EmployeeRow = memo(function EmployeeRow({ row }: { row: Row }) {
         </Text>
       </View>
       <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
-    </Pressable>
+    </PressableScale>
   );
 });
 
@@ -138,7 +139,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.cardBorder,
     borderRadius: radius.md,
-    backgroundColor: colors.card,
+    backgroundColor: colors.cardRaised,
     paddingHorizontal: spacing.md,
   },
   searchInput: {
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     padding: spacing.md,
   },
   pressed: {

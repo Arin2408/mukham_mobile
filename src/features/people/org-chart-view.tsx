@@ -9,6 +9,7 @@ import { errorMessage } from '@/api/errors';
 import { getHierarchy, setManager, type HierarchyPerson } from '@/api/people';
 import { OptionSheet } from '@/components/picker-field';
 import { StateView } from '@/components/state-view';
+import { PressableScale } from '@/components/ui/motion';
 import { colors, fonts, radius, spacing, text } from '@/theme';
 
 const fullName = (p: HierarchyPerson) => `${p.first_name} ${p.last_name}`.trim();
@@ -112,12 +113,12 @@ export function OrgChartView() {
           <StateView kind="empty" message={current ? t('org.noReports', { name: fullName(current) }) : t('people.empty')} />
         }
         renderItem={({ item }) => (
-          <Pressable
+          <PressableScale
             onPress={() => setPath([...trail, item.employee_id])}
             onLongPress={() => actions(item)}
             accessibilityRole="button"
             accessibilityHint={t('org.hint')}
-            style={({ pressed }) => [styles.row, pressed && styles.pressed]}>
+            style={styles.row}>
             <View style={styles.body}>
               <Text style={styles.name}>{fullName(item)}</Text>
               <Text style={text.muted}>
@@ -133,7 +134,7 @@ export function OrgChartView() {
               hitSlop={10}>
               <Ionicons name="ellipsis-horizontal" size={20} color={colors.textMuted} />
             </Pressable>
-          </Pressable>
+          </PressableScale>
         )}
       />
 
@@ -200,7 +201,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     padding: spacing.md,
     marginLeft: spacing.md,
   },

@@ -7,8 +7,11 @@ import { getDashboardSummary } from '@/api/admin';
 import { BarChart } from '@/components/bar-chart';
 import { Screen } from '@/components/screen';
 import { StateView } from '@/components/state-view';
+import { Card } from '@/components/ui/card';
+import { FadeIn } from '@/components/ui/motion';
+import { StatTile } from '@/components/ui/stat-tile';
 import { parseDateParam } from '@/lib/format';
-import { colors, fonts, radius, spacing, text } from '@/theme';
+import { colors, fonts, spacing, text } from '@/theme';
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -26,12 +29,13 @@ export default function AdminDashboardScreen() {
       ) : (
         <>
           <View style={styles.tiles}>
-            <Tile value={String(s!.total_employees)} label={t('dashboard.employees')} />
-            <Tile value={`${s!.attendance_score}%`} label={t('dashboard.score')} />
-            <Tile value={String(s!.active_shifts)} label={t('dashboard.shifts')} />
-            <Tile value={String(s!.office_locations)} label={t('dashboard.offices')} />
+            <StatTile index={1} tone="blue" value={s!.total_employees} label={t('dashboard.employees')} />
+            <StatTile index={2} tone="purple" value={s!.attendance_score} suffix="%" label={t('dashboard.score')} />
+            <StatTile index={3} tone="purple" value={s!.active_shifts} label={t('dashboard.shifts')} />
+            <StatTile index={4} tone="blue" value={s!.office_locations} label={t('dashboard.offices')} />
           </View>
 
+          <FadeIn index={5}>
           <BarChart
             title={t('dashboard.week')}
             labels={s!.weekly_attendance.map((d) => WEEKDAYS[parseDateParam(d.date).getDay()])}
@@ -44,14 +48,15 @@ export default function AdminDashboardScreen() {
               total: s!.total_employees,
             })}
           />
+          </FadeIn>
 
-          <Section title={t('dashboard.leaderboard')} empty={t('dashboard.noDepartments')}>
+          <Section index={6} title={t('dashboard.leaderboard')} empty={t('dashboard.noDepartments')}>
             {s!.leaderboard.map((d, i) => (
               <Line key={d.department_id} label={`${i + 1}. ${d.department_name}`} value={`${Math.round(d.punctuality_score)}%`} />
             ))}
           </Section>
 
-          <Section title={t('dashboard.roles')} empty={t('dashboard.noEmployees')}>
+          <Section index={7} title={t('dashboard.roles')} empty={t('dashboard.noEmployees')}>
             {s!.roles.map((r) => (
               <Line
                 key={r.name}
@@ -66,21 +71,12 @@ export default function AdminDashboardScreen() {
   );
 }
 
-function Tile({ value, label }: { value: string; label: string }) {
+function Section({ index, title, empty, children }: { index: number; title: string; empty: string; children: ReactNode[] }) {
   return (
-    <View style={styles.tile}>
-      <Text style={styles.tileValue}>{value}</Text>
-      <Text style={text.muted}>{label}</Text>
-    </View>
-  );
-}
-
-function Section({ title, empty, children }: { title: string; empty: string; children: ReactNode[] }) {
-  return (
-    <View style={styles.card}>
+    <Card index={index} style={styles.card}>
       <Text style={text.muted}>{title}</Text>
       {children.length ? children : <Text style={text.body}>{empty}</Text>}
-    </View>
+    </Card>
   );
 }
 
@@ -101,27 +97,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.sm,
   },
-  tile: {
-    flexBasis: '48%',
-    flexGrow: 1,
-    backgroundColor: colors.card,
-    borderColor: colors.cardBorder,
-    borderWidth: 1,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    gap: 2,
-  },
-  tileValue: {
-    fontFamily: fonts.bold,
-    fontSize: 26,
-    color: colors.text,
-  },
   card: {
-    backgroundColor: colors.card,
-    borderColor: colors.cardBorder,
-    borderWidth: 1,
-    borderRadius: radius.md,
-    padding: spacing.md,
     gap: spacing.sm,
   },
   line: {

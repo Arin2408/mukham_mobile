@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { getTasks, type Task, type TaskStatus } from '@/api/tasks';
 import { ListScreen } from '@/components/list-screen';
@@ -11,6 +11,7 @@ import { Segmented } from '@/components/segmented';
 import { StateView } from '@/components/state-view';
 import { TaskPills } from '@/features/tasks/task-pills';
 import { formatDate } from '@/lib/format';
+import { PressableScale } from '@/components/ui/motion';
 import { colors, fonts, radius, spacing, text } from '@/theme';
 
 export default function TasksScreen() {
@@ -53,10 +54,10 @@ export default function TasksScreen() {
 function TaskRow({ task }: { task: Task }) {
   const { t } = useTranslation();
   return (
-    <Pressable
+    <PressableScale
       onPress={() => router.push({ pathname: '/task/[id]', params: { id: String(task.task_id) } })}
       accessibilityRole="button"
-      style={({ pressed }) => [styles.row, pressed && styles.pressed]}>
+      style={styles.row}>
       <View style={styles.body}>
         <Text style={styles.title} numberOfLines={2}>
           {task.title}
@@ -67,7 +68,7 @@ function TaskRow({ task }: { task: Task }) {
         <TaskPills task={task} />
       </View>
       <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     padding: spacing.md,
   },
   pressed: {

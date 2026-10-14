@@ -1,8 +1,12 @@
 import type { ReactNode } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { colors, spacing, text } from '@/theme';
+
+import { GlowBackground } from './ui/glow-background';
+import { GradientText } from './ui/gradient-text';
+import { FadeIn } from './ui/motion';
 
 type Props = {
   title: string;
@@ -12,10 +16,11 @@ type Props = {
   onRefresh?: () => void;
 };
 
-/** The frame every tab screen uses: safe area, title, scrolling content. */
+/** The frame every tab screen uses: safe area, a faint glow, the gradient title, scrolling content. */
 export function Screen({ title, children, refreshing, onRefresh }: Props) {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+      <GlowBackground />
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={
@@ -23,9 +28,11 @@ export function Screen({ title, children, refreshing, onRefresh }: Props) {
             <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
           ) : undefined
         }>
-        <Text style={[text.title, styles.title]} accessibilityRole="header">
-          {title}
-        </Text>
+        <FadeIn style={styles.title}>
+          <GradientText style={text.title} accessibilityRole="header">
+            {title}
+          </GradientText>
+        </FadeIn>
         {children}
       </ScrollView>
     </SafeAreaView>

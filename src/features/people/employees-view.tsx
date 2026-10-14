@@ -9,6 +9,7 @@ import { errorMessage } from '@/api/errors';
 import { getEmployees, type Employee } from '@/api/people';
 import { ListScreenBody } from '@/components/list-screen';
 import { StateView } from '@/components/state-view';
+import { PressableScale } from '@/components/ui/motion';
 import { colors, fonts, radius, spacing, text } from '@/theme';
 
 import { shareEmployeesCsv } from './share-csv';
@@ -91,14 +92,14 @@ export function EmployeesView() {
           )
         }
       />
-      <Pressable
+      <PressableScale
         onPress={() => router.push('/person/form')}
         accessibilityRole="button"
         accessibilityLabel={t('people.add')}
-        style={({ pressed }) => [styles.fab, pressed && styles.pressed]}>
+        style={styles.fab}>
         <Ionicons name="add" size={22} color={colors.primaryText} />
         <Text style={styles.fabText}>{t('people.add')}</Text>
-      </Pressable>
+      </PressableScale>
     </View>
   );
 }
@@ -107,10 +108,10 @@ const EmployeeRow = memo(function EmployeeRow({ employee: e }: { employee: Emplo
   const { t } = useTranslation();
   const role = [e.designation_name, e.department_name].filter((v) => v && v !== 'N/A').join(' · ');
   return (
-    <Pressable
+    <PressableScale
       onPress={() => router.push({ pathname: '/person/[id]', params: { id: String(e.employee_id) } })}
       accessibilityRole="button"
-      style={({ pressed }) => [styles.row, pressed && styles.pressed]}>
+      style={styles.row}>
       <View style={styles.body}>
         <Text style={styles.name} numberOfLines={1}>
           {`${e.first_name} ${e.last_name}`.trim()}
@@ -122,7 +123,7 @@ const EmployeeRow = memo(function EmployeeRow({ employee: e }: { employee: Emplo
         )}
       </View>
       <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
-    </Pressable>
+    </PressableScale>
   );
 });
 
@@ -138,7 +139,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.cardBorder,
     borderRadius: radius.md,
-    backgroundColor: colors.card,
+    backgroundColor: colors.cardRaised,
     paddingHorizontal: spacing.md,
   },
   searchInput: {
@@ -165,7 +166,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     padding: spacing.md,
   },
   pressed: {

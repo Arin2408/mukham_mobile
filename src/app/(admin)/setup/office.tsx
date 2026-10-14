@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.cardBorder,
     borderRadius: radius.md,
-    backgroundColor: colors.card,
+    backgroundColor: colors.cardRaised,
     paddingHorizontal: spacing.md,
     fontFamily: fonts.regular,
     fontSize: 15,
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     padding: spacing.md,
   },
   pressed: {
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.cardBorder,
     borderRadius: radius.md,
-    backgroundColor: colors.card,
+    backgroundColor: colors.cardRaised,
   },
   stepperText: {
     fontFamily: fonts.bold,

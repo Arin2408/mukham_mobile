@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCameraPermissions } from 'expo-camera';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming, ZoomIn } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Linking, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,6 +17,8 @@ import {
 import { createLivenessSession, getLivenessCredentials, type LivenessCredentials } from '@/api/auth';
 import { ApiError, errorMessage } from '@/api/errors';
 import { Button } from '@/components/button';
+import { GlowBackground } from '@/components/ui/glow-background';
+import { easeOut, FadeIn } from '@/components/ui/motion';
 import { CameraPermissionRequest } from '@/features/face/camera-permission';
 import { LivenessDetector, livenessAvailable } from '@/features/face/liveness-detector';
 import { getPosition, PositionError, type Position } from '@/features/location/get-position';
@@ -266,25 +269,47 @@ type ResultProps = {
 
 /** The full-screen result: a big icon, what happened, and what to do next. */
 function Result({ icon, tone, title, lines, primary, secondary }: ResultProps) {
+  const color = tone === 'good' ? colors.successText : colors.danger;
   return (
     <SafeAreaView style={styles.result}>
+      <GlowBackground />
       <View style={styles.resultBody}>
-        <Ionicons name={icon} size={96} color={tone === 'good' ? colors.primary : colors.danger} />
-        <Text style={styles.resultTitle} accessibilityRole="header">
-          {title}
-        </Text>
-        {lines.map((line) => (
-          <Text key={line} style={styles.resultLine}>
-            {line}
+        <View style={styles.iconWrap}>
+          {tone === 'good' ? <Burst color={color} /> : null}
+          <Animated.View entering={ZoomIn.springify().damping(12)}>
+            <Ionicons name={icon} size={96} color={color} />
+          </Animated.View>
+        </View>
+        <FadeIn index={2}>
+          <Text style={styles.resultTitle} accessibilityRole="header">
+            {title}
           </Text>
+        </FadeIn>
+        {lines.map((line, i) => (
+          <FadeIn key={line} index={3 + i}>
+            <Text style={styles.resultLine}>{line}</Text>
+          </FadeIn>
         ))}
       </View>
-      <View style={styles.actions}>
+      <FadeIn index={5} style={styles.actions}>
         <Button label={primary.label} onPress={primary.onPress} />
         {secondary ? <Button variant="link" label={secondary.label} onPress={secondary.onPress} /> : null}
-      </View>
+      </FadeIn>
     </SafeAreaView>
   );
+}
+
+/** A ring that bursts outward once behind the success tick. */
+function Burst({ color }: { color: string }) {
+  const p = useSharedValue(0);
+  useEffect(() => {
+    p.set(withTiming(1, { duration: 900, easing: easeOut }));
+  }, [p]);
+  const style = useAnimatedStyle(() => ({
+    opacity: 0.6 * (1 - p.get()),
+    transform: [{ scale: 0.6 + p.get() * 1.2 }],
+  }));
+  return <Animated.View style={[styles.burst, { borderColor: color }, style]} pointerEvents="none" />;
 }
 
 const styles = StyleSheet.create({
@@ -309,6 +334,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
+  },
+  iconWrap: {
+    width: 140,
+    height: 140,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  burst: {
+    position: 'absolute',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 3,
   },
   resultTitle: {
     fontFamily: fonts.bold,

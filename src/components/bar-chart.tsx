@@ -1,6 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
+import { useEffect } from 'react';
 
 import { colors, fonts, radius, spacing, text } from '@/theme';
+
+import { easeOut } from './ui/motion';
 
 const BAR_AREA = 96;
 
@@ -38,12 +42,10 @@ export function BarChart({ labels, values, max: fullHeight, formatValue, highlig
             accessibilityLabel={`${labels[i]}: ${formatValue(value)}`}>
             <Text style={styles.value}>{value > 0 ? formatValue(value) : ''}</Text>
             <View style={styles.track}>
-              <View
-                style={[
-                  styles.bar,
-                  { height: value > 0 ? Math.max(3, (value / max) * BAR_AREA) : 0 },
-                  i === highlight && styles.today,
-                ]}
+              <Bar
+                height={value > 0 ? Math.max(3, (value / max) * BAR_AREA) : 0}
+                index={i}
+                today={i === highlight}
               />
             </View>
             <Text style={[styles.label, i === highlight && styles.todayLabel]}>{labels[i]}</Text>
@@ -54,12 +56,22 @@ export function BarChart({ labels, values, max: fullHeight, formatValue, highlig
   );
 }
 
+/** One bar, growing from the bottom to its height, a little after the one before. */
+function Bar({ height, index, today }: { height: number; index: number; today: boolean }) {
+  const h = useSharedValue(0);
+  useEffect(() => {
+    h.set(withDelay(150 + index * 50, withTiming(height, { duration: 600, easing: easeOut })));
+  }, [height, index, h]);
+  const style = useAnimatedStyle(() => ({ height: h.get() }));
+  return <Animated.View style={[styles.bar, today && styles.today, style]} />;
+}
+
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     padding: spacing.md,
     gap: spacing.md,
   },

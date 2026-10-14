@@ -1,8 +1,12 @@
 import type { ReactElement, ReactNode } from 'react';
-import { FlatList, RefreshControl, StyleSheet, Text, View, type ListRenderItem } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, View, type ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { colors, spacing, text } from '@/theme';
+
+import { GlowBackground } from './ui/glow-background';
+import { GradientText } from './ui/gradient-text';
+import { FadeIn } from './ui/motion';
 
 type Props<T> = {
   title: string;
@@ -26,13 +30,16 @@ type Props<T> = {
 export function ListScreen<T>({ title, header, ...rest }: Props<T>) {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+      <GlowBackground />
       <ListScreenBody
         {...rest}
         header={
           <>
-            <Text style={[text.title, styles.title]} accessibilityRole="header">
-              {title}
-            </Text>
+            <FadeIn style={styles.title}>
+              <GradientText style={text.title} accessibilityRole="header">
+                {title}
+              </GradientText>
+            </FadeIn>
             {header}
           </>
         }
@@ -54,9 +61,10 @@ export function ListScreenBody<T>({
 }: Omit<Props<T>, 'title'>) {
   return (
     <FlatList
-      style={styles.safe}
+      style={styles.list}
       data={data}
-      renderItem={renderItem}
+      // Each row fades up in turn, as the web's cards do.
+      renderItem={(info) => <FadeIn index={info.index + 1}>{renderItem(info)}</FadeIn>}
       keyExtractor={keyExtractor}
       contentContainerStyle={[styles.content, bottomSpace ? { paddingBottom: bottomSpace } : null]}
       ItemSeparatorComponent={Separator}
@@ -82,6 +90,9 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  list: {
+    flex: 1,
   },
   content: {
     padding: spacing.md,

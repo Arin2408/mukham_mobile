@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { adminSignIn, cleanMobile, employeePasswordStep, isFaceRegistered } from '@/api/auth';
 import { errorMessage } from '@/api/errors';
@@ -10,8 +10,11 @@ import { Button } from '@/components/button';
 import { ErrorBanner } from '@/components/error-banner';
 import { Segmented } from '@/components/segmented';
 import { TextField } from '@/components/text-field';
+import { Gradient } from '@/components/ui/gradient';
+import { FadeIn } from '@/components/ui/motion';
+import { BrandPanel } from '@/features/brand/brand-panel';
 import { useEmployeeSignIn, useSession } from '@/store/session';
-import { colors, fonts, spacing, text } from '@/theme';
+import { colors, gradients, radius, spacing, text } from '@/theme';
 
 type Role = 'employee' | 'admin';
 
@@ -19,6 +22,7 @@ export default function SignInScreen() {
   const { t } = useTranslation();
   const signIn = useSession((s) => s.signIn);
   const startEmployeeSignIn = useEmployeeSignIn((s) => s.start);
+  const insets = useSafeAreaInsets();
 
   const [role, setRole] = useState<Role>('employee');
   const [mobile, setMobile] = useState('');
@@ -56,61 +60,70 @@ export default function SignInScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <KeyboardAvoidingView style={styles.safe} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <View style={styles.brand}>
-            <Text style={styles.logo}>MUKHAM</Text>
-            <Text style={text.muted}>{t('signIn.subtitle')}</Text>
-          </View>
+        <ScrollView
+          contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.lg }]}
+          keyboardShouldPersistTaps="handled">
+          <BrandPanel tagline={t('brand.tagline')} topInset={insets.top} />
 
-          <Segmented
-            options={[
-              { value: 'employee', label: t('signIn.roleEmployee') },
-              { value: 'admin', label: t('signIn.roleAdmin') },
-            ]}
-            value={role}
-            onChange={(value) => {
-              setRole(value);
-              setError(null);
-            }}
-          />
+          {/* The form card overlaps the panel, with the web's gradient border. */}
+          <FadeIn index={3} style={styles.cardWrap}>
+            <Gradient colors={gradients.border} style={styles.border}>
+              <View style={styles.card}>
+                <Text style={text.heading}>{t('signIn.title')}</Text>
+                <Text style={[text.muted, styles.subtitle]}>{t('signIn.subtitle')}</Text>
 
-          <ErrorBanner message={error} />
+                <Segmented
+                  options={[
+                    { value: 'employee', label: t('signIn.roleEmployee') },
+                    { value: 'admin', label: t('signIn.roleAdmin') },
+                  ]}
+                  value={role}
+                  onChange={(value) => {
+                    setRole(value);
+                    setError(null);
+                  }}
+                />
 
-          <TextField
-            label={t('signIn.mobile')}
-            placeholder={t('signIn.mobilePlaceholder')}
-            value={mobile}
-            onChangeText={setMobile}
-            keyboardType="phone-pad"
-            autoComplete="tel"
-            textContentType="telephoneNumber"
-            maxLength={15}
-          />
-          <TextField
-            label={t('signIn.password')}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            autoComplete="password"
-            textContentType="password"
-            onSubmitEditing={submit}
-          />
+                <ErrorBanner message={error} />
 
-          <Button label={t('signIn.continue')} onPress={submit} loading={loading} />
+                <TextField
+                  label={t('signIn.mobile')}
+                  placeholder={t('signIn.mobilePlaceholder')}
+                  value={mobile}
+                  onChangeText={setMobile}
+                  keyboardType="phone-pad"
+                  autoComplete="tel"
+                  textContentType="telephoneNumber"
+                  maxLength={15}
+                />
+                <TextField
+                  label={t('signIn.password')}
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  autoComplete="password"
+                  textContentType="password"
+                  onSubmitEditing={submit}
+                />
 
-          {role === 'admin' ? (
-            <View style={styles.links}>
-              <Button variant="link" label={t('signIn.adminForgot')} onPress={() => router.push('/forgot-password')} />
-              <Button variant="link" label={t('signIn.register')} onPress={() => router.push('/register')} />
-            </View>
-          ) : (
-            <Text style={[text.muted, styles.center]}>{t('signIn.employeeForgot')}</Text>
-          )}
+                <Button label={t('signIn.continue')} onPress={submit} loading={loading} />
+
+                {role === 'admin' ? (
+                  <View style={styles.links}>
+                    <Button variant="link" label={t('signIn.adminForgot')} onPress={() => router.push('/forgot-password')} />
+                    <Button variant="link" label={t('signIn.register')} onPress={() => router.push('/register')} />
+                  </View>
+                ) : (
+                  <Text style={[text.muted, styles.center]}>{t('signIn.employeeForgot')}</Text>
+                )}
+              </View>
+            </Gradient>
+          </FadeIn>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -121,20 +134,23 @@ const styles = StyleSheet.create({
   },
   content: {
     flexGrow: 1,
-    justifyContent: 'center',
+  },
+  cardWrap: {
+    marginTop: -spacing.xl,
+    marginHorizontal: spacing.md,
+  },
+  border: {
+    borderRadius: radius.lg + 1,
+    padding: 1,
+  },
+  card: {
+    backgroundColor: colors.card,
+    borderRadius: radius.lg,
     padding: spacing.lg,
     gap: spacing.md,
   },
-  brand: {
-    alignItems: 'center',
-    gap: spacing.xs,
-    marginBottom: spacing.lg,
-  },
-  logo: {
-    fontFamily: fonts.bold,
-    fontSize: 32,
-    letterSpacing: 2,
-    color: colors.text,
+  subtitle: {
+    marginTop: -spacing.sm,
   },
   links: {
     alignItems: 'center',

@@ -3,13 +3,14 @@ import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { getOrgTasks, type Task } from '@/api/tasks';
 import { monthWeeks, MonthGrid } from '@/components/month-grid';
 import { StateView } from '@/components/state-view';
 import { TaskPills } from '@/features/tasks/task-pills';
 import { formatDate, formatDateShort, toDateParam } from '@/lib/format';
+import { PressableScale } from '@/components/ui/motion';
 import { colors, fonts, radius, spacing, text } from '@/theme';
 
 /** Tasks running on a day: assigned on or before it, and not completed before it. */
@@ -67,14 +68,14 @@ export function TasksView() {
           onDay.map((task) => <TaskRow key={task.task_id} task={task} />)
         )}
       </ScrollView>
-      <Pressable
+      <PressableScale
         onPress={() => router.push({ pathname: '/task-form', params: { date: selected } })}
         accessibilityRole="button"
         accessibilityLabel={t('adminTasks.assign')}
-        style={({ pressed }) => [styles.fab, pressed && styles.pressed]}>
+        style={styles.fab}>
         <Ionicons name="add" size={22} color={colors.primaryText} />
         <Text style={styles.fabText}>{t('adminTasks.assign')}</Text>
-      </Pressable>
+      </PressableScale>
     </View>
   );
 }
@@ -87,10 +88,10 @@ function TaskRow({ task }: { task: Task }) {
     completed: t('tasks.completed'),
   }[task.status];
   return (
-    <Pressable
+    <PressableScale
       onPress={() => router.push({ pathname: '/task-form', params: { id: String(task.task_id) } })}
       accessibilityRole="button"
-      style={({ pressed }) => [styles.row, pressed && styles.pressed]}>
+      style={styles.row}>
       <View style={styles.body}>
         <Text style={styles.title} numberOfLines={2}>
           {task.title}
@@ -103,7 +104,7 @@ function TaskRow({ task }: { task: Task }) {
         <TaskPills task={task} />
       </View>
       <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -128,7 +129,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     padding: spacing.md,
   },
   pressed: {

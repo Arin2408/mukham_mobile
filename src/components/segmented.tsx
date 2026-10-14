@@ -34,7 +34,7 @@ export function Segmented<T extends string>({ options, value, onChange }: Props<
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
-    backgroundColor: colors.card,
+    backgroundColor: colors.cardRaised,
     borderColor: colors.cardBorder,
     borderWidth: 1,
     borderRadius: radius.md,

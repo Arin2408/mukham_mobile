@@ -6,7 +6,8 @@
 
 export const colors = {
   background: '#0A0A0A', // --background
-  card: '#141414',
+  card: '#000000', // --card (dark): cards are black on the near-black page
+  cardRaised: 'rgba(255, 255, 255, 0.05)', // inputs and controls (the web's bg-foreground/5)
   cardBorder: '#1F2937', // --border
   text: '#FAFAFA', // --foreground
   textMuted: '#A3A3A3', // --muted-foreground
@@ -16,6 +17,12 @@ export const colors = {
   danger: '#DC2626', // --destructive
   dangerSoft: 'rgba(220, 38, 38, 0.12)',
   success: '#16A34A',
+  successText: '#4ADE80',
+  warningText: '#FACC15',
+  dangerText: '#F87171',
+  infoText: '#60A5FA',
+  purple: '#9333EA',
+  cyan: '#22D3EE',
   tabBar: '#000000',
 } as const;
 
@@ -38,7 +45,35 @@ export const spacing = {
 export const radius = {
   sm: 8,
   md: 12,
-  lg: 16,
+  lg: 16, // cards, as the web's rounded-2xl
+  xl: 24,
+} as const;
+
+/** Gradients from the web app (globals.css). Colours run top-left to bottom-right. */
+export const gradients = {
+  /** Page titles: blue-600 to purple-600. */
+  title: ['#2563EB', '#9333EA'],
+  /** Logo tile and highlights: blue-400 to purple-500. */
+  brand: ['#60A5FA', '#A855F7'],
+  /** The sign-in brand panel: blue-600, indigo-600, purple-700. */
+  panel: ['#2563EB', '#4F46E5', '#7E22CE'],
+  /** Stat tiles, alternating. */
+  statBlue: ['rgba(30, 58, 138, 0.45)', 'rgba(0, 0, 0, 1)'],
+  statPurple: ['rgba(88, 28, 135, 0.45)', 'rgba(0, 0, 0, 1)'],
+  /** The sign-in card's border. */
+  border: ['rgba(59, 130, 246, 0.6)', 'rgba(168, 85, 247, 0.6)', 'rgba(6, 182, 212, 0.4)'],
+} as const;
+
+export const statBorders = {
+  blue: 'rgba(30, 58, 138, 0.6)',
+  purple: 'rgba(88, 28, 135, 0.6)',
+} as const;
+
+/** Motion from the web: cards fade up 12 px over 500 ms, staggered 60 ms. */
+export const motion = {
+  enter: 500,
+  stagger: 60,
+  rise: 12,
 } as const;
 
 export const text = {

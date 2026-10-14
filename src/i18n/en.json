@@ -415,5 +415,11 @@
     "denied": "Notifications are turned off for Mukham in your phone's settings.",
     "unavailable": "This version of the app can't receive notifications. Install the latest Mukham app build.",
     "registerFailed": "This phone couldn't be registered for notifications: {{reason}}"
+  },
+  "brand": {
+    "headline": "Attendance you can trust.",
+    "faceVerified": "Face verified",
+    "faceCheck": "Live face check",
+    "tagline": "Real faces, real locations, real time."
   }
 }
