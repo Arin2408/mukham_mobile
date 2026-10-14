@@ -19,4 +19,5 @@ jobs:
       - run: npm ci
       - run: npx tsc --noEmit
       - run: npx expo lint
+      - run: npm run check:compiler
       - run: npx jest --ci

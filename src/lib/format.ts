@@ -146,3 +146,22 @@ export function formatMonth(date: Date): string {
 export function formatDateShort(value: string): string {
   return formatDay(parseDateParam(value).toISOString());
 }
+
+/** "8 h" or "8 h 30 min" for a duration in minutes. */
+export function formatDuration(minutes: number): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return m ? `${h} h ${m} min` : `${h} h`;
+}
+
+/**
+ * Minutes a shift lasts, and whether it ends the next day (end before
+ * start), as the backend counts them. Equal times are not a shift.
+ */
+export function shiftLength(start: string, end: string): { minutes: number; overnight: boolean } {
+  const toMin = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+  const s = toMin(start);
+  const e = toMin(end);
+  const overnight = e < s;
+  return { minutes: overnight ? e + 1440 - s : e - s, overnight };
+}

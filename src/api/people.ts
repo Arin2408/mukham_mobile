@@ -1,3 +1,5 @@
+import { departmentLabel, designationLabel, shiftLabel } from '@/lib/setup-labels';
+
 import { api } from './client';
 
 /** An employee as the admin sees them (GET /employees). */
@@ -80,21 +82,23 @@ export function setManager(id: number, managerId: number | null) {
   return api<unknown>(`/employees/${id}/manager`, { method: 'PUT', body: { manager_id: managerId } });
 }
 
-/** Choices for the form's pickers, as id + name. */
+/** Choices for the form's pickers, as id + name, each named with where it belongs. */
 export async function getFormOptions() {
   const [departments, designations, shifts, locations] = await Promise.all([
-    api<{ department_id: number; details: string }[]>('/departments'),
-    api<{ designation_id: number; details: string }[]>('/designations'),
-    api<{ shift_id: number; shift_name: string; shift_start_time: string; shift_end_time: string }[]>('/shifts'),
+    api<{ department_id: number; details: string; location_id: number }[]>('/departments'),
+    api<{ designation_id: number; department_id: number; details: string }[]>('/designations'),
+    api<
+      { shift_id: number; shift_name: string; shift_start_time: string; shift_end_time: string; department_id: number }[]
+    >('/shifts'),
     api<{ location_id: number; location_name: string }[]>('/locations'),
   ]);
   return {
-    departments: departments.map((d): Option => ({ id: d.department_id, name: d.details })),
-    designations: designations.map((d): Option => ({ id: d.designation_id, name: d.details })),
-    shifts: shifts.map((s): Option => ({
-      id: s.shift_id,
-      name: `${s.shift_name} (${s.shift_start_time.slice(0, 5)} - ${s.shift_end_time.slice(0, 5)})`,
+    departments: departments.map((d): Option => ({ id: d.department_id, name: departmentLabel(d, locations) })),
+    designations: designations.map((d): Option => ({
+      id: d.designation_id,
+      name: designationLabel(d, departments, locations),
     })),
+    shifts: shifts.map((s): Option => ({ id: s.shift_id, name: shiftLabel(s, departments, locations) })),
     locations: locations.map((l): Option => ({ id: l.location_id, name: l.location_name })),
   };
 }

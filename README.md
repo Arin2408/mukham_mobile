@@ -85,9 +85,10 @@ download the file with curl, check its checksum, and put Gradle zips in
 npx tsc --noEmit   # types
 npx expo lint      # lint
 npx jest           # tests
+npm run check:compiler   # code the React Compiler could turn into a crash
 ```
 
-The same three run on GitHub for every push and pull request
+The same checks run on GitHub for every push and pull request
 (`.github/workflows/ci.yml`).
 
 ## Layout

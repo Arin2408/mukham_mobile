@@ -50,18 +50,33 @@ describe('people server calls', () => {
     expect(apiMock).toHaveBeenCalledWith('/employees/5/manager', { method: 'PUT', body: { manager_id: null } });
   });
 
-  it('turns the four lists into picker choices', async () => {
+  it('names each choice with where it belongs, so same-named ones can be told apart', async () => {
     apiMock.mockImplementation(async (path: string) => {
-      if (path === '/departments') return [{ department_id: 1, details: 'IT' }];
-      if (path === '/designations') return [{ designation_id: 2, details: 'Dev' }];
-      if (path === '/shifts') return [{ shift_id: 3, shift_name: 'Night', shift_start_time: '20:00:00', shift_end_time: '04:00:00' }];
-      return [{ location_id: 4, location_name: 'HQ' }];
+      if (path === '/departments')
+        return [
+          { department_id: 1, details: 'Sales', location_id: 4 },
+          { department_id: 2, details: 'Sales', location_id: 5 },
+        ];
+      if (path === '/designations') return [{ designation_id: 7, department_id: 2, details: 'Manager' }];
+      if (path === '/shifts')
+        return [
+          { shift_id: 3, shift_name: 'Night', shift_start_time: '20:00', shift_end_time: '04:00', department_id: 1 },
+          { shift_id: 6, shift_name: 'Night', shift_start_time: '20:00', shift_end_time: '04:00', department_id: 2 },
+        ];
+      return [
+        { location_id: 4, location_name: 'HQ' },
+        { location_id: 5, location_name: 'Pune' },
+      ];
     });
-    await expect(getFormOptions()).resolves.toEqual({
-      departments: [{ id: 1, name: 'IT' }],
-      designations: [{ id: 2, name: 'Dev' }],
-      shifts: [{ id: 3, name: 'Night (20:00 - 04:00)' }],
-      locations: [{ id: 4, name: 'HQ' }],
-    });
+    const options = await getFormOptions();
+    expect(options.departments).toEqual([
+      { id: 1, name: 'Sales · HQ' },
+      { id: 2, name: 'Sales · Pune' },
+    ]);
+    expect(options.designations).toEqual([{ id: 7, name: 'Manager · Sales · Pune' }]);
+    expect(options.shifts).toEqual([
+      { id: 3, name: 'Night 20:00 - 04:00 · Sales · HQ' },
+      { id: 6, name: 'Night 20:00 - 04:00 · Sales · Pune' },
+    ]);
   });
 });
