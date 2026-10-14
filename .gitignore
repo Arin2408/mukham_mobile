@@ -45,3 +45,8 @@ coverage/
 Thumbs.db
 .vscode/
 .idea/
+
+# App builds (share through EAS or a release, not git)
+*.apk
+*.aab
+*.ipa
