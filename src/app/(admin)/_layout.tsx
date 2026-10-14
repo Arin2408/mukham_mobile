@@ -1,48 +1,26 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { Tabs } from 'expo-router';
-import type { ComponentProps } from 'react';
-import { useTranslation } from 'react-i18next';
-import type { ColorValue } from 'react-native';
+import { Stack } from 'expo-router';
 
 import { colors, fonts } from '@/theme';
 
-type IconName = ComponentProps<typeof Ionicons>['name'];
-
-function tabIcon(name: IconName) {
-  return function TabIcon({ color, size }: { color: ColorValue; size: number }) {
-    return <Ionicons name={name} color={color} size={size} />;
-  };
-}
-
-/** The organisation admin's tabs. Employees never see these. */
+/** The admin's area: the tabs, plus screens on top of them such as one employee's attendance. */
 export default function AdminLayout() {
-  const { t } = useTranslation();
-
   return (
-    <Tabs
+    <Stack
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textMuted,
-        tabBarStyle: { backgroundColor: colors.tabBar, borderTopColor: colors.cardBorder },
-        tabBarLabelStyle: { fontFamily: fonts.medium, fontSize: 11 },
+        contentStyle: { backgroundColor: colors.background },
       }}>
-      <Tabs.Screen
-        name="dashboard"
-        options={{ title: t('admin.dashboard'), tabBarIcon: tabIcon('grid-outline') }}
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen
+        name="employee/[id]"
+        options={{
+          headerShown: true,
+          headerStyle: { backgroundColor: colors.background },
+          headerTintColor: colors.text,
+          headerTitleStyle: { fontFamily: fonts.semibold },
+          headerShadowVisible: false,
+        }}
       />
-      <Tabs.Screen
-        name="attendance"
-        options={{ title: t('admin.attendance'), tabBarIcon: tabIcon('calendar-outline') }}
-      />
-      <Tabs.Screen
-        name="people"
-        options={{ title: t('admin.people'), tabBarIcon: tabIcon('people-outline') }}
-      />
-      <Tabs.Screen
-        name="setup"
-        options={{ title: t('admin.setup'), tabBarIcon: tabIcon('settings-outline') }}
-      />
-    </Tabs>
+    </Stack>
   );
 }

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { getAttendanceHistory, type HistoryRecord } from '@/api/attendance';
-import { HoursChart } from '@/components/hours-chart';
+import { BarChart } from '@/components/bar-chart';
 import { ListScreen } from '@/components/list-screen';
 import { Pill } from '@/components/pill';
 import { Segmented } from '@/components/segmented';
@@ -19,6 +19,7 @@ import {
   startOfWeek,
   toDateParam,
   type RangePreset,
+  WEEK_LABELS,
 } from '@/lib/format';
 import { colors, fonts, radius, spacing, text } from '@/theme';
 
@@ -59,9 +60,12 @@ export default function HistoryScreen() {
       onRefresh={refresh}
       header={
         <>
-          <HoursChart
-            hours={daily}
-            todayIndex={(now.getDay() + 6) % 7}
+          <BarChart
+            labels={WEEK_LABELS}
+            values={daily}
+            max={9}
+            formatValue={(h) => h.toFixed(1)}
+            highlight={(now.getDay() + 6) % 7}
             title={t('history.thisWeek')}
             total={formatHours(weekTotal)}
           />

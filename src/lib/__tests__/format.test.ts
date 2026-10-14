@@ -1,4 +1,6 @@
 import {
+  daysAgo,
+  dayStatus,
   formatDate,
   formatDay,
   formatDistance,
@@ -68,5 +70,32 @@ describe('dates for History', () => {
       new Date(2026, 9, 12),
     );
     expect(hours).toEqual([9.5, 0, 0, 0, 0, 0, 4]);
+  });
+});
+
+describe("an employee's status today", () => {
+  const now = new Date(2026, 9, 13, 15, 0);
+  const at = (d: number, h: number) => new Date(2026, 9, d, h).toISOString();
+
+  it('is in while a record is open, even one from last night', () => {
+    expect(dayStatus([{ check_in: at(13, 9), check_out: null, hours_worked: null }], now)).toEqual({
+      kind: 'in',
+      since: at(13, 9),
+    });
+    expect(dayStatus([{ check_in: at(12, 22), check_out: null, hours_worked: null }], now).kind).toBe('in');
+  });
+
+  it('is out after checking out today, and not in when the last record is older', () => {
+    const records = [
+      { check_in: at(12, 9), check_out: at(12, 18), hours_worked: 9 },
+      { check_in: at(13, 9), check_out: at(13, 13), hours_worked: 4 },
+    ];
+    expect(dayStatus(records, now)).toEqual({ kind: 'out', at: at(13, 13), hours: 4 });
+    expect(dayStatus(records.slice(0, 1), now)).toEqual({ kind: 'absent' });
+    expect(dayStatus([], now)).toEqual({ kind: 'absent' });
+  });
+
+  it('counts days back for date ranges', () => {
+    expect(daysAgo(29, now)).toBe('2026-09-14');
   });
 });

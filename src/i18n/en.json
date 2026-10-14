@@ -149,8 +149,6 @@
     "attendance": "Attendance",
     "people": "People",
     "setup": "Setup",
-    "dashboardPlaceholder": "Today's totals, charts and the department leaderboard arrive in Phase 5.",
-    "attendancePlaceholder": "Every employee's attendance and manual check-in arrive in Phase 5.",
     "peoplePlaceholder": "Employees, the org chart and tasks arrive in Phase 6.",
     "setupPlaceholder": "Departments, designations, shifts, office locations and the organisation profile arrive in Phase 7."
   },
@@ -201,5 +199,35 @@
     "offlineBody": "Check your internet connection and try again.",
     "errorTitle": "Couldn't load this",
     "retry": "Try again"
+  },
+  "dashboard": {
+    "employees": "Employees",
+    "score": "Attendance score",
+    "shifts": "Shifts",
+    "offices": "Office locations",
+    "week": "Checked in, last 7 days",
+    "todayPresent": "Today {{present}} of {{total}}",
+    "leaderboard": "Most punctual departments",
+    "noDepartments": "No departments yet.",
+    "roles": "Employees by designation",
+    "noEmployees": "No employees yet.",
+    "unassigned": "No designation"
+  },
+  "attendance": {
+    "search": "Search by name or mobile",
+    "today": "Today: {{in}} in, {{out}} checked out, {{absent}} not in",
+    "inSince": "In since {{time}}",
+    "outAt": "Checked out at {{time}} · {{hours}}",
+    "notIn": "Not in yet",
+    "notInToday": "Not in yet today",
+    "noMatch": "No employee matches your search.",
+    "noEmployees": "No employees yet. Add them on the web, or in People (Phase 6).",
+    "checkInNow": "Check in now",
+    "checkOutNow": "Check out now",
+    "confirmIn": "Check in {{name}}?",
+    "confirmOut": "Check out {{name}}?",
+    "confirmBody": "This records the current time and marks it as added by admin.",
+    "manualNote": "Uses the current time and is marked \"Added by admin\".",
+    "lastDays": "Last {{days}} days"
   }
 }

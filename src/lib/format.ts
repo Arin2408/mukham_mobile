@@ -99,3 +99,35 @@ export function hoursByWeekday(
   }
   return hours;
 }
+
+export type DayStatus =
+  | { kind: 'in'; since: string }
+  | { kind: 'out'; at: string; hours: number }
+  | { kind: 'absent' };
+
+/**
+ * Where an employee stands today, from their recent records (any order):
+ * checked in (an open record, even one from last night), checked out
+ * today, or not in yet.
+ */
+export function dayStatus(
+  records: { check_in: string; check_out: string | null; hours_worked: number | null }[],
+  now: Date = new Date(),
+): DayStatus {
+  const latest = [...records].sort((a, b) => Date.parse(b.check_in) - Date.parse(a.check_in))[0];
+  if (!latest) {
+    return { kind: 'absent' };
+  }
+  if (!latest.check_out) {
+    return { kind: 'in', since: latest.check_in };
+  }
+  if (isToday(latest.check_in, now)) {
+    return { kind: 'out', at: latest.check_out, hours: latest.hours_worked ?? 0 };
+  }
+  return { kind: 'absent' };
+}
+
+/** Today minus `days`, as a date parameter. */
+export function daysAgo(days: number, now: Date = new Date()): string {
+  return toDateParam(new Date(now.getFullYear(), now.getMonth(), now.getDate() - days));
+}

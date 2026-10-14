@@ -21,34 +21,53 @@ type Props<T> = {
  * Screen for long lists: like Screen, but the rows are virtualised, so
  * months of history stay smooth on a low-end phone.
  */
-export function ListScreen<T>({ title, header, data, renderItem, keyExtractor, empty, refreshing, onRefresh }: Props<T>) {
+export function ListScreen<T>({ title, header, ...rest }: Props<T>) {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
-      <FlatList
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        contentContainerStyle={styles.content}
-        ItemSeparatorComponent={Separator}
-        ListHeaderComponent={
-          <View style={styles.header}>
+      <ListScreenBody
+        {...rest}
+        header={
+          <>
             <Text style={[text.title, styles.title]} accessibilityRole="header">
               {title}
             </Text>
             {header}
-          </View>
-        }
-        ListEmptyComponent={empty}
-        initialNumToRender={12}
-        windowSize={7}
-        removeClippedSubviews
-        refreshControl={
-          onRefresh ? (
-            <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
-          ) : undefined
+          </>
         }
       />
     </SafeAreaView>
+  );
+}
+
+/** The list alone, for screens under a header bar (which gives the title). */
+export function ListScreenBody<T>({
+  header,
+  data,
+  renderItem,
+  keyExtractor,
+  empty,
+  refreshing,
+  onRefresh,
+}: Omit<Props<T>, 'title'>) {
+  return (
+    <FlatList
+      style={styles.safe}
+      data={data}
+      renderItem={renderItem}
+      keyExtractor={keyExtractor}
+      contentContainerStyle={styles.content}
+      ItemSeparatorComponent={Separator}
+      ListHeaderComponent={header ? <View style={styles.header}>{header}</View> : null}
+      ListEmptyComponent={empty}
+      initialNumToRender={12}
+      windowSize={7}
+      removeClippedSubviews
+      refreshControl={
+        onRefresh ? (
+          <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+        ) : undefined
+      }
+    />
   );
 }
 
