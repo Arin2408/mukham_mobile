@@ -9,6 +9,7 @@ import { Avatar } from '@/components/avatar';
 import { Button } from '@/components/button';
 import { Screen } from '@/components/screen';
 import { SignOutSection } from '@/components/sign-out-section';
+import { NotificationSettings } from '@/features/notifications/notification-settings';
 import { StateView } from '@/components/state-view';
 import { formatShiftTime } from '@/lib/format';
 import { colors, fonts, radius, spacing, text } from '@/theme';
@@ -62,6 +63,7 @@ export default function ProfileScreen() {
           <Button label={t('profile.showIdCard')} onPress={() => router.push('/id-card')} />
         </>
       )}
+      <NotificationSettings />
       <SignOutSection />
     </Screen>
   );

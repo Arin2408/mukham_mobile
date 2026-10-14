@@ -50,3 +50,8 @@ Thumbs.db
 *.apk
 *.aab
 *.ipa
+
+# Firebase config for push notifications (kept out of the repo; EAS builds
+# get it as a file secret)
+google-services*.json
+GoogleService-Info*.plist

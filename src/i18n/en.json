@@ -398,5 +398,22 @@
     "designationName": "Designation name",
     "needDepartment": "Add a department first: every designation belongs to one.",
     "designationsAfterSave": "After saving, you can add this department's designations here or in Setup › Designations."
+  },
+  "push": {
+    "introTitle": "Get reminders?",
+    "introShift": "Shortly before your shift starts, if you haven't checked in",
+    "introCheckOut": "If you forget to check out after your shift",
+    "introTask": "When you're given a new task",
+    "introNote": "You can change these any time in Profile.",
+    "turnOn": "Turn on reminders",
+    "notNow": "Not now",
+    "title": "Notifications",
+    "switchShift": "Before my shift",
+    "switchCheckOut": "If I forget to check out",
+    "switchTask": "New tasks",
+    "offNote": "Reminders are off on this phone.",
+    "denied": "Notifications are turned off for Mukham in your phone's settings.",
+    "unavailable": "This version of the app can't receive notifications. Install the latest Mukham app build.",
+    "registerFailed": "This phone couldn't be registered for notifications: {{reason}}"
   }
 }

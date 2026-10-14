@@ -2,6 +2,7 @@
   "expo": {
     "name": "Mukham",
     "slug": "mukham",
+    "owner": "arin24s-team",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -20,7 +21,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "output": "single",
@@ -60,11 +62,24 @@
           "isIosBackgroundLocationEnabled": false
         }
       ],
-      "./plugins/with-gradle-plugin-repositories.js"
+      "./plugins/with-gradle-plugin-repositories.js",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/android-icon-monochrome.png",
+          "color": "#2563EB",
+          "defaultChannel": "reminders"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "117b22f5-206e-48e1-a3db-2b7cec28f955"
+      }
     }
   }
 }

@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { signOutOnServer, verifySession } from '@/api/auth';
 import { ApiError } from '@/api/errors';
 import { tokenStore, type Role } from '@/api/tokens';
+import { unregisterFromPush } from '@/features/notifications/push';
 
 type Status = 'loading' | 'signedOut' | 'signedIn';
 
@@ -49,6 +50,8 @@ export const useSession = create<SessionState>((set) => ({
   },
 
   async signOut() {
+    // First, while the session still works: this phone gets no more reminders.
+    await unregisterFromPush();
     await signOutOnServer();
     await tokenStore.clear();
     set({ status: 'signedOut', role: null });

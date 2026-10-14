@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router';
 
+import { usePushSetup } from '@/features/notifications/use-push-setup';
 import { colors, fonts } from '@/theme';
 
 /**
@@ -7,6 +8,8 @@ import { colors, fonts } from '@/theme';
  * a task's details and the ID card.
  */
 export default function EmployeeLayout() {
+  usePushSetup();
+
   return (
     <Stack
       screenOptions={{
@@ -26,6 +29,7 @@ export default function EmployeeLayout() {
         }}
       />
       <Stack.Screen name="id-card" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="notifications-intro" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }
