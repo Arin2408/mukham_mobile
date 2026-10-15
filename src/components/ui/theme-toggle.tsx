@@ -21,7 +21,8 @@ export function ThemeToggle({ onPanel }: Props) {
 
   return (
     <PressableScale
-      onPress={toggle}
+      // The new theme spreads out from here.
+      onPress={(e) => toggle({ x: e.nativeEvent.pageX, y: e.nativeEvent.pageY })}
       accessibilityRole="button"
       accessibilityLabel={dark ? t('theme.toLight') : t('theme.toDark')}
       hitSlop={8}

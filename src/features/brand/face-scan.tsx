@@ -5,6 +5,7 @@ import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
 import { useCycle, useLoop } from '@/components/ui/motion';
+import { ScanFaceIcon } from '@/components/ui/scan-face-icon';
 import { fonts, useTheme } from '@/theme';
 
 const SIZE = 132;
@@ -37,8 +38,7 @@ export function FaceScan() {
       <Ring delay={0} />
       <Ring delay={1500} />
       <View style={styles.box}>
-        <Ionicons name="scan-outline" size={84} color="rgba(255, 255, 255, 0.92)" />
-        <Ionicons name="person-outline" size={38} color="rgba(255, 255, 255, 0.92)" style={styles.person} />
+        <ScanFaceIcon size={SIZE / 2} strokeWidth={1.25} color="rgba(255, 255, 255, 0.9)" />
         <Animated.View style={[styles.scanLine, line]} />
       </View>
       <View style={[styles.corner, styles.tl]} />
@@ -84,9 +84,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-  },
-  person: {
-    position: 'absolute',
   },
   scanLine: {
     position: 'absolute',

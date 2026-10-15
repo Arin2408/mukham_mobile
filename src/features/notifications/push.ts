@@ -15,6 +15,10 @@ type NotificationsModule = typeof import('expo-notifications');
 
 const TOKEN_KEY = 'mukham.pushToken';
 const ASKED_KEY = 'mukham.pushAsked';
+// This app install's secret: proves to the server that a push address really
+// is this phone's, so nobody else can move it to their account. Kept across
+// sign-outs, so the next person on this phone can take the address over.
+const INSTALL_KEY = 'mukham.installKey';
 export const CHANNEL_ID = 'reminders';
 
 export type PushPermission = 'granted' | 'denied' | 'undetermined' | 'unavailable';
@@ -74,13 +78,26 @@ export async function askPushPermission(): Promise<PushPermission> {
  * When allowed: gets this phone's push address from Expo and gives it to
  * the server for the signed-in person. Safe to call on every app start.
  */
+/** This install's secret, made on first use; null on an app build without expo-crypto. */
+async function installKey(): Promise<string | null> {
+  const saved = await SecureStore.getItemAsync(INSTALL_KEY);
+  if (saved) return saved;
+  if (!requireOptionalNativeModule('ExpoCrypto')) return null;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const Crypto = require('expo-crypto') as typeof import('expo-crypto');
+  const bytes = Crypto.getRandomBytes(32);
+  const key = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  await SecureStore.setItemAsync(INSTALL_KEY, key);
+  return key;
+}
+
 export async function registerForPush(): Promise<boolean> {
   const n = notifications();
   if (!n || (await getPushPermission()) !== 'granted') return false;
   await ensureChannel(n);
   const projectId = Constants.expoConfig?.extra?.eas?.projectId as string | undefined;
   const { data: token } = await n.getExpoPushTokenAsync({ projectId });
-  await registerPushDevice(token, Platform.OS === 'ios' ? 'ios' : 'android');
+  await registerPushDevice(token, Platform.OS === 'ios' ? 'ios' : 'android', await installKey());
   await SecureStore.setItemAsync(TOKEN_KEY, token);
   return true;
 }

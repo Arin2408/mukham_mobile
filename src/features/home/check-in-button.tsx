@@ -1,93 +1,59 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Text, View } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { Text } from 'react-native';
 
-import { Gradient } from '@/components/ui/gradient';
-import { PressableScale, useCycle } from '@/components/ui/motion';
-import { fonts, makeStyles, useTheme } from '@/theme';
-
-const SIZE = 148;
+import { PressableScale } from '@/components/ui/motion';
+import { fonts, makeStyles, radius, spacing } from '@/theme';
 
 type Props = {
   label: string;
-  /** "in": shows Check out, calm; "out": Check in, pulsing to invite a tap. */
+  /** "check-in": blue, as the web's Start Shift; "check-out": red, as its End Session. */
   mode: 'check-in' | 'check-out';
   disabled?: boolean;
   onPress: () => void;
 };
 
-/** The big round check-in button: brand gradient, with a ring pulsing outward while there's something to do. */
+/** A plain full-width check-in / check-out button, as on the web member page. */
 export function CheckInButton({ label, mode, disabled, onPress }: Props) {
   const styles = useStyles();
-  const { gradients } = useTheme();
-  const pulse = useCycle(2200);
-  const ring = useAnimatedStyle(() => ({
-    opacity: disabled ? 0 : 0.5 * (1 - pulse.get()),
-    transform: [{ scale: 1 + pulse.get() * 0.35 }],
-  }));
+  const out = mode === 'check-out';
 
   return (
-    <View style={styles.wrap}>
-      <Animated.View style={[styles.ring, mode === 'check-out' && styles.ringOut, ring]} pointerEvents="none" />
-      <PressableScale
-        onPress={onPress}
-        disabled={disabled}
-        accessibilityRole="button"
-        accessibilityLabel={label}
-        accessibilityState={{ disabled: !!disabled }}
-        style={[styles.button, disabled && styles.disabled]}>
-        <Gradient
-          colors={mode === 'check-out' ? ['#16A34A', '#0D9488'] : gradients.panel}
-          style={styles.fill}>
-          <Ionicons name={mode === 'check-out' ? 'log-out-outline' : 'scan-outline'} size={44} color="#FFFFFF" />
-          <Text style={styles.label}>{label}</Text>
-        </Gradient>
-      </PressableScale>
-    </View>
+    <PressableScale
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: !!disabled }}
+      style={[styles.button, out && styles.out, disabled && styles.disabled]}>
+      <Ionicons name={out ? 'log-out-outline' : 'location-outline'} size={18} color="#FFFFFF" />
+      <Text style={styles.label}>{label}</Text>
+    </PressableScale>
   );
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  wrap: {
-    width: SIZE + 60,
-    height: SIZE + 60,
-    alignSelf: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  ring: {
-    position: 'absolute',
-    width: SIZE,
-    height: SIZE,
-    borderRadius: SIZE / 2,
-    borderWidth: 3,
-    borderColor: '#818CF8',
-  },
-  ringOut: {
-    borderColor: '#34D399',
-  },
   button: {
-    width: SIZE,
-    height: SIZE,
-    borderRadius: SIZE / 2,
-    shadowColor: colors.primary,
-    shadowOpacity: 0.55,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 10,
-  },
-  fill: {
-    flex: 1,
-    borderRadius: SIZE / 2,
+    height: 52,
+    borderRadius: radius.md,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
-    overflow: 'hidden',
+    gap: spacing.sm,
+    backgroundColor: colors.primary,
+    shadowColor: colors.primary,
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
+  },
+  out: {
+    backgroundColor: colors.danger,
+    shadowColor: colors.danger,
   },
   label: {
     fontFamily: fonts.bold,
-    fontSize: 17,
-    color: '#FFFFFF',
+    fontSize: 15,
+    color: colors.primaryText,
   },
   disabled: {
     opacity: 0.4,

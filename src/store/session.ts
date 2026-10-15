@@ -2,10 +2,20 @@ import { create } from 'zustand';
 
 import { signOutOnServer, verifySession } from '@/api/auth';
 import { ApiError } from '@/api/errors';
+import { queryClient } from '@/api/query-client';
 import { tokenStore, type Role } from '@/api/tokens';
 import { unregisterFromPush } from '@/features/notifications/push';
 
 type Status = 'loading' | 'signedOut' | 'signedIn';
+
+/**
+ * Every way of being signed out ends here: nothing from this person's
+ * session (profile, tasks, attendance) stays cached for whoever signs in next.
+ */
+function signedOut() {
+  queryClient.clear();
+  return { status: 'signedOut' as const, role: null };
+}
 
 type SessionState = {
   status: Status;
@@ -25,7 +35,7 @@ export const useSession = create<SessionState>((set) => ({
   async restore() {
     const [refresh, role] = await Promise.all([tokenStore.getRefresh(), tokenStore.getRole()]);
     if (!refresh || !role) {
-      set({ status: 'signedOut', role: null });
+      set(signedOut());
       return;
     }
 
@@ -38,7 +48,7 @@ export const useSession = create<SessionState>((set) => ({
         set({ status: 'signedIn', role });
       } else {
         await tokenStore.clear();
-        set({ status: 'signedOut', role: null });
+        set(signedOut());
       }
     }
   },
@@ -54,11 +64,11 @@ export const useSession = create<SessionState>((set) => ({
     await unregisterFromPush();
     await signOutOnServer();
     await tokenStore.clear();
-    set({ status: 'signedOut', role: null });
+    set(signedOut());
   },
 
   expire() {
-    set({ status: 'signedOut', role: null });
+    set(signedOut());
   },
 }));
 

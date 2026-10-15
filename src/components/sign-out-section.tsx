@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
@@ -15,14 +14,12 @@ export function SignOutSection() {
   const { t } = useTranslation();
   const role = useSession((s) => s.role);
   const signOut = useSession((s) => s.signOut);
-  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
 
   async function onSignOut() {
     setLoading(true);
+    // Also empties the cache, so nothing of this person's is left for the next one.
     await signOut();
-    // Nothing from this person's session stays cached for the next one.
-    queryClient.clear();
   }
 
   return (

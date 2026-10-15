@@ -1,10 +1,10 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { GlowBackground } from '@/components/ui/glow-background';
 import { Gradient } from '@/components/ui/gradient';
 import { FadeIn } from '@/components/ui/motion';
+import { ScanFaceIcon } from '@/components/ui/scan-face-icon';
 import { fonts, spacing, useTheme } from '@/theme';
 
 import { FaceScan } from './face-scan';
@@ -22,7 +22,7 @@ export function BrandPanel({ tagline, scan = false, topInset = 0 }: Props) {
       <GlowBackground variant="panel" />
       <FadeIn style={styles.logoRow}>
         <View style={styles.logoTile}>
-          <Ionicons name="scan-outline" size={22} color="#FFFFFF" />
+          <ScanFaceIcon size={22} color="#FFFFFF" />
         </View>
         <Text style={styles.logo}>Mukham</Text>
       </FadeIn>

@@ -7,23 +7,20 @@ import {
   Archivo_700Bold,
   useFonts,
 } from '@expo-google-fonts/archivo';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, type ReactNode } from 'react';
 
 import { setOnSessionExpired } from '@/api/client';
+import { queryClient } from '@/api/query-client';
 import { UpdateRequired } from '@/components/update-required';
 import { APP_VERSION, useAppConfig } from '@/hooks/use-server';
 import { useSession } from '@/store/session';
 import { ThemeProvider as AppThemeProvider, useTheme } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
-
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: 1 } },
-});
 
 
 /** Blocks the app with "Update required" when the server asks for it. */

@@ -16,6 +16,7 @@ import { Gradient } from '@/components/ui/gradient';
 import { GradientText } from '@/components/ui/gradient-text';
 import { easeOut, FadeIn, PressableScale } from '@/components/ui/motion';
 import { PersonAvatar } from '@/components/ui/person-avatar';
+import { ScanFaceIcon } from '@/components/ui/scan-face-icon';
 import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 type Props = {
@@ -131,7 +132,7 @@ function Front({ card: c }: { card: IdCard }) {
       <Gradient colors={['#2563EB', '#4F46E5', '#9333EA']} style={styles.band}>
         <View style={styles.bandRow}>
           <View style={styles.logoTile}>
-            <Ionicons name="scan-outline" size={16} color="#FFFFFF" />
+            <ScanFaceIcon size={16} color="#FFFFFF" />
           </View>
           <Text style={styles.logo}>Mukham</Text>
           <View style={styles.grow} />

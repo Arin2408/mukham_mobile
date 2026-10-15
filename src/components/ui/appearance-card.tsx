@@ -1,42 +1,35 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 
-import { Segmented } from '@/components/segmented';
-import { makeStyles, spacing, useThemeChoice, type Scheme } from '@/theme';
+import { makeStyles, spacing, useTheme } from '@/theme';
 
 import { Card } from './card';
+import { ThemeToggle } from './theme-toggle';
 
-/** Light or dark, as on the web; the choice is kept on this phone. */
+/** Light or dark, as on the web: one sun/moon button. The choice is kept on this phone. */
 export function AppearanceCard({ index = 0 }: { index?: number }) {
   const { t } = useTranslation();
-  const { theme, setScheme } = useThemeChoice();
+  const theme = useTheme();
   const styles = useStyles();
   return (
     <Card index={index} style={styles.card}>
-      <View style={styles.head}>
-        <Ionicons name={theme.scheme === 'dark' ? 'moon-outline' : 'sunny-outline'} size={18} color={theme.colors.infoText} />
+      <View style={styles.label}>
         <Text style={theme.text.heading}>{t('theme.title')}</Text>
+        <Text style={theme.text.muted}>{theme.scheme === 'dark' ? t('theme.dark') : t('theme.light')}</Text>
       </View>
-      <Segmented<Scheme>
-        value={theme.scheme}
-        onChange={setScheme}
-        options={[
-          { value: 'dark', label: t('theme.dark') },
-          { value: 'light', label: t('theme.light') },
-        ]}
-      />
+      <ThemeToggle />
     </Card>
   );
 }
 
 const useStyles = makeStyles(() => ({
   card: {
-    gap: spacing.md,
-  },
-  head: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.md,
+  },
+  label: {
+    flex: 1,
+    gap: 2,
   },
 }));

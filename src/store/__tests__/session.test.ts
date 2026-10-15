@@ -1,5 +1,6 @@
 import { signOutOnServer, verifySession } from '@/api/auth';
 import { ApiError } from '@/api/errors';
+import { queryClient } from '@/api/query-client';
 import { tokenStore } from '@/api/tokens';
 import { useSession } from '@/store/session';
 
@@ -80,5 +81,25 @@ describe('session', () => {
     expect(signOutOnServer).toHaveBeenCalled();
     expect(useSession.getState().status).toBe('signedOut');
     expect(await tokenStore.getRole()).toBeNull();
+  });
+
+  it("leaves nothing of the last person's data when the session ends on its own", async () => {
+    await useSession.getState().signIn({ access: 'a', refresh: 'r' }, 'employee');
+    queryClient.setQueryData(['profile'], { name: 'Previous person' });
+
+    // E.g. their password was reset on another device.
+    useSession.getState().expire();
+
+    expect(useSession.getState().status).toBe('signedOut');
+    expect(queryClient.getQueryData(['profile'])).toBeUndefined();
+  });
+
+  it("clears the last person's data on Sign out", async () => {
+    await useSession.getState().signIn({ access: 'a', refresh: 'r' }, 'employee');
+    queryClient.setQueryData(['tasks'], [{ id: 1 }]);
+
+    await useSession.getState().signOut();
+
+    expect(queryClient.getQueryData(['tasks'])).toBeUndefined();
   });
 });
