@@ -7,10 +7,7 @@ export type NotificationPreferences = { shift_start: boolean; check_out: boolean
  * `installKey` proves the address is this phone's (null on older app builds).
  */
 export function registerPushDevice(token: string, platform: 'android' | 'ios', installKey: string | null) {
-  return api<null>('/devices', {
-    method: 'POST',
-    body: installKey ? { token, platform, install_key: installKey } : { token, platform },
-  });
+  return api<null>('/devices', { method: 'POST', body: { token, platform, install_key: installKey } });
 }
 
 /** At sign-out: this phone gets nothing more for this person. */

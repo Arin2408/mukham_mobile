@@ -14,13 +14,14 @@ jest.mock('expo-secure-store', () => ({
 
 // The wave runs only with motion allowed and a screenshot module in the build.
 jest.mock('react-native-reanimated', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   ...require('react-native-reanimated/mock'),
   useReducedMotion: () => false,
 }));
 jest.mock('@/theme/snapshot', () => ({
   snapshot: jest.fn(),
   release: jest.fn(async () => {}),
-  crossFade: () => false,
+  viewTransition: () => false,
 }));
 const mockSnapshot = snapshot as jest.MockedFunction<typeof snapshot>;
 

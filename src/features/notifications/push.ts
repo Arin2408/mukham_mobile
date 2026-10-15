@@ -74,10 +74,6 @@ export async function askPushPermission(): Promise<PushPermission> {
   return status === 'granted' ? 'granted' : status === 'denied' ? 'denied' : 'undetermined';
 }
 
-/**
- * When allowed: gets this phone's push address from Expo and gives it to
- * the server for the signed-in person. Safe to call on every app start.
- */
 /** This install's secret, made on first use; null on an app build without expo-crypto. */
 async function installKey(): Promise<string | null> {
   const saved = await SecureStore.getItemAsync(INSTALL_KEY);
@@ -91,6 +87,10 @@ async function installKey(): Promise<string | null> {
   return key;
 }
 
+/**
+ * When allowed: gets this phone's push address from Expo and gives it to
+ * the server for the signed-in person. Safe to call on every app start.
+ */
 export async function registerForPush(): Promise<boolean> {
   const n = notifications();
   if (!n || (await getPushPermission()) !== 'granted') return false;

@@ -4,13 +4,14 @@ import { Image, Platform, StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
+  useDerivedValue,
   useReducedMotion,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
-import { crossFade, release, snapshot } from './snapshot';
+import { release, snapshot, viewTransition } from './snapshot';
 import { themeFor, type Scheme, type Theme } from './tokens';
 
 const KEY = 'mukham.theme';
@@ -21,16 +22,15 @@ const GIVE_UP = 4000;
 const THEMES = { dark: themeFor('dark'), light: themeFor('light') } as const;
 
 /** Where on screen the switch was tapped; the new theme spreads out from there. */
-export type Origin = { x: number; y: number };
+type Origin = { x: number; y: number };
 
 type Choice = {
   theme: Theme;
-  setScheme: (scheme: Scheme, origin?: Origin) => void;
   toggle: (origin?: Origin) => void;
 };
 
 // Without a provider (tests, previews) everything is the dark theme.
-const ThemeContext = createContext<Choice>({ theme: THEMES.dark, setScheme: () => {}, toggle: () => {} });
+const ThemeContext = createContext<Choice>({ theme: THEMES.dark, toggle: () => {} });
 
 async function readSaved(): Promise<Scheme | null> {
   try {
@@ -52,16 +52,25 @@ async function save(scheme: Scheme): Promise<void> {
 }
 
 /**
- * A switch in progress: pictures of the app before and after, and the circle
- * the new theme grows from (centre and final radius).
+ * A switch in progress: pictures of the app before and after, the screen size
+ * they were taken at, and the circle the new theme grows from (centre and final radius).
  */
-type Wave = { before: string; after: string | null; x: number; y: number; radius: number };
+type Wave = {
+  before: string;
+  after: string | null;
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+  radius: number;
+};
 
 /** Holds the light/dark choice (dark by default, as on the web) and remembers it on the phone. */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [scheme, setSchemeState] = useState<Scheme>('dark');
   const [wave, setWave] = useState<Wave | null>(null);
-  const [size, setSize] = useState({ width: 0, height: 0 });
+  // Read only when a switch starts, so a layout change (keyboard, rotation) doesn't re-render the app.
+  const size = useRef({ width: 0, height: 0 });
   const grow = useSharedValue(0);
   const reduced = useReducedMotion();
   const content = useRef<View>(null);
@@ -80,18 +89,27 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const show = useCallback((next: Wave | null) => {
-    live.current = next;
-    setWave(next);
-  }, []);
+  const show = useCallback(
+    (next: Wave | null) => {
+      if (next && !next.after) {
+        // A new switch: the circle starts from nothing.
+        grow.set(0);
+        started.current = false;
+      }
+      live.current = next;
+      setWave(next);
+    },
+    [grow],
+  );
 
   // Ends the switch, whether the wave finished or something failed along the way. Safe to call twice.
   const finish = useCallback(() => {
     const done = live.current;
-    if (!done) return;
-    show(null);
-    release(done.before);
-    if (done.after) release(done.after);
+    if (done) {
+      show(null);
+      release(done.before);
+      if (done.after) release(done.after);
+    }
     busy.current = false;
     // Switched again mid-wave, or failed before restyling: catch up.
     setSchemeState(target.current);
@@ -133,7 +151,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     );
   }, [grow, finish]);
 
-  const setScheme = useCallback(
+  const switchTo = useCallback(
     async (next: Scheme, origin?: Origin) => {
       save(next);
       if (next === target.current) return;
@@ -144,49 +162,46 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         apply();
         return;
       }
-      const x = origin?.x ?? size.width / 2;
-      const y = origin?.y ?? size.height / 2;
-      if (crossFade(apply, { x, y })) return;
+      const { width, height } = size.current;
+      const x = origin?.x ?? width / 2;
+      const y = origin?.y ?? height / 2;
+      if (viewTransition(apply, { x, y })) return;
 
       busy.current = true;
       const before = await snapshot(content.current);
       if (!before) {
-        busy.current = false;
-        setSchemeState(target.current);
+        finish();
         return;
       }
-      grow.set(0);
-      started.current = false;
-      const radius = Math.hypot(Math.max(x, size.width - x), Math.max(y, size.height - y));
-      show({ before, after: null, x, y, radius });
+      const radius = Math.hypot(Math.max(x, width - x), Math.max(y, height - y));
+      show({ before, after: null, width, height, x, y, radius });
     },
-    [reduced, size, grow, show],
+    [reduced, show, finish],
   );
 
   const value = useMemo<Choice>(
     () => ({
       theme: THEMES[scheme],
-      setScheme,
-      toggle: (origin) => setScheme(target.current === 'dark' ? 'light' : 'dark', origin),
+      toggle: (origin) => switchTo(target.current === 'dark' ? 'light' : 'dark', origin),
     }),
-    [scheme, setScheme],
+    [scheme, switchTo],
   );
 
+  // The circle's corner (top-left), as it grows from the tap point.
+  const corner = useDerivedValue(() => {
+    const r = (wave?.radius ?? 0) * grow.get();
+    return { r, left: (wave?.x ?? 0) - r, top: (wave?.y ?? 0) - r };
+  }, [wave]);
   const circle = useAnimatedStyle(() => {
-    const r = (wave?.radius ?? 0) * grow.get();
-    const x = wave?.x ?? 0;
-    const y = wave?.y ?? 0;
-    return { left: x - r, top: y - r, width: r * 2, height: r * 2, borderRadius: r };
-  }, [wave]);
+    const { r, left, top } = corner.get();
+    return { left, top, width: r * 2, height: r * 2, borderRadius: r };
+  });
   // Keeps the picture still while the circle around it grows.
-  const inside = useAnimatedStyle(() => {
-    const r = (wave?.radius ?? 0) * grow.get();
-    return { left: r - (wave?.x ?? 0), top: r - (wave?.y ?? 0) };
-  }, [wave]);
+  const inside = useAnimatedStyle(() => ({ left: -corner.get().left, top: -corner.get().top }));
 
   return (
     <ThemeContext.Provider value={value}>
-      <View style={styles.root} onLayout={(e) => setSize(e.nativeEvent.layout)}>
+      <View style={styles.root} onLayout={(e) => (size.current = e.nativeEvent.layout)}>
         <View ref={content} collapsable={false} style={styles.root}>
           {children}
         </View>
@@ -210,7 +225,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
                   fadeDuration={0}
                   onLoad={startWave}
                   onError={finish}
-                  style={[styles.inside, { width: size.width, height: size.height }, inside]}
+                  style={[styles.inside, { width: wave.width, height: wave.height }, inside]}
                 />
               </Animated.View>
             ) : null}

@@ -1,5 +1,7 @@
 import { act, renderHook } from '@testing-library/react-native';
 
+import { usePushSetup } from '../use-push-setup';
+
 const mockPush = jest.fn();
 jest.mock('expo-router', () => ({ router: { push: (...a: unknown[]) => mockPush(...a) } }));
 
@@ -18,8 +20,6 @@ jest.mock('../push', () => ({
   registerForPush: async () => {},
   wasPushAsked: async () => true,
 }));
-
-import { usePushSetup } from '../use-push-setup';
 
 describe('opening the screen for a tapped notification', () => {
   it('opens it once, and not again when the employee screens mount again (e.g. after signing back in)', async () => {

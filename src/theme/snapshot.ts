@@ -25,7 +25,7 @@ export async function release(uri: string): Promise<void> {
   }
 }
 
-/** The browser animates the switch on its own (web only). */
-export function crossFade(_apply: () => void, _origin: { x: number; y: number }): boolean {
+/** The browser animates the switch on its own (web only); on a phone the provider draws the wave. */
+export function viewTransition(_apply: () => void, _origin: { x: number; y: number }): boolean {
   return false;
 }

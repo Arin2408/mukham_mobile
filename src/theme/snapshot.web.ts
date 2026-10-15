@@ -19,7 +19,7 @@ const STILL = `::view-transition-old(root), ::view-transition-new(root) {
  * Grows the page after `apply` out of the page before it, in a circle from
  * `origin`. False if the browser can't.
  */
-export function crossFade(apply: () => void, origin: { x: number; y: number }): boolean {
+export function viewTransition(apply: () => void, origin: { x: number; y: number }): boolean {
   if (typeof document === 'undefined' || !document.startViewTransition) return false;
   if (!document.getElementById('theme-wave')) {
     const style = document.createElement('style');
