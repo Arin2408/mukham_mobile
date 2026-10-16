@@ -65,19 +65,33 @@ function EmployeeForm({ existing, employees, options }: FormProps) {
   const { text } = useTheme();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const department = existing?.department_id ?? null;
   const [form, setForm] = useState<EmployeeInput>(() => ({
     first_name: existing?.first_name ?? '',
     last_name: existing?.last_name ?? '',
     mobile_number: existing?.mobile_number ?? '',
     email: existing?.email ?? '',
-    department: existing?.department_id ?? null,
-    designation: existing?.designation_id ?? null,
-    shift: existing?.shift_id ?? null,
+    department,
+    // One saved from another department (before the server checked) starts empty, to be chosen again.
+    designation: inDepartment(options.designations, existing?.designation_id, department),
+    shift: inDepartment(options.shifts, existing?.shift_id, department),
     office_location: existing?.office_location_id ?? null,
     manager: existing?.manager_id ?? null,
   }));
   const [problem, setProblem] = useState<string | null>(null);
   const set = <K extends keyof EmployeeInput>(key: K) => (value: EmployeeInput[K]) => setForm((f) => ({ ...f, [key]: value }));
+
+  // A new department: keep only its own designation and shift, and start with its office.
+  const setDepartment = (id: number | null) =>
+    setForm((f) => ({
+      ...f,
+      department: id,
+      designation: inDepartment(options.designations, f.designation, id),
+      shift: inDepartment(options.shifts, f.shift, id),
+      office_location: options.departments.find((d) => d.id === id)?.locationId ?? f.office_location,
+    }));
+  const designations = options.designations.filter((d) => d.departmentId === form.department);
+  const shifts = options.shifts.filter((s) => s.departmentId === form.department);
 
   // Anyone but the person being edited can be their manager.
   const managers = employees
@@ -143,9 +157,21 @@ function EmployeeForm({ existing, employees, options }: FormProps) {
           autoCapitalize="none"
           autoCorrect={false}
         />
-        <PickerField label={t('profile.department')} value={form.department} options={options.departments} onChange={set('department')} noneLabel={t('person.none')} />
-        <PickerField label={t('profile.designation')} value={form.designation} options={options.designations} onChange={set('designation')} noneLabel={t('person.none')} />
-        <PickerField label={t('profile.shift')} value={form.shift} options={options.shifts} onChange={set('shift')} noneLabel={t('person.none')} />
+        <PickerField label={t('profile.department')} value={form.department} options={options.departments} onChange={setDepartment} noneLabel={t('person.none')} />
+        <PickerField
+          label={t('profile.designation')}
+          value={form.designation}
+          options={designations}
+          onChange={set('designation')}
+          noneLabel={form.department == null ? t('person.departmentFirst') : t('person.none')}
+        />
+        <PickerField
+          label={t('profile.shift')}
+          value={form.shift}
+          options={shifts}
+          onChange={set('shift')}
+          noneLabel={form.department == null ? t('person.departmentFirst') : t('person.none')}
+        />
         <PickerField label={t('profile.office')} value={form.office_location} options={options.locations} onChange={set('office_location')} noneLabel={t('person.none')} />
         <PickerField label={t('person.reportsTo')} value={form.manager} options={managers} onChange={set('manager')} noneLabel={t('person.organisation')} />
         <ErrorBanner message={problem ?? (save.isError ? errorMessage(save.error, t) : null)} />
@@ -154,6 +180,11 @@ function EmployeeForm({ existing, employees, options }: FormProps) {
       </ScrollView>
     </KeyboardAvoidingView>
   );
+}
+
+/** The id, if that designation or shift belongs to the department; otherwise null. */
+function inDepartment(options: { id: number; departmentId: number }[], id: number | null | undefined, department: number | null) {
+  return options.some((o) => o.id === id && o.departmentId === department) ? id! : null;
 }
 
 const useStyles = makeStyles(({ colors }) => ({

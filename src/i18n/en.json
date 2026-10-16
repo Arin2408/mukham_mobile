@@ -154,7 +154,21 @@
     "signOut": "Sign out",
     "signedInAs": "Signed in as {{role}}",
     "roleEmployee": "employee",
-    "roleAdmin": "admin"
+    "roleAdmin": "admin",
+    "changePassword": "Change password",
+    "changePasswordDetail": "Other phones and browsers will be signed out",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password",
+    "passwordNote": "At least 8 characters. Other phones and browsers signed in to this account will be signed out; this phone stays signed in.",
+    "save": "Change password",
+    "changedTitle": "Password changed",
+    "changedBody": "Use your new password next time you sign in.",
+    "invalid": {
+      "missing": "Fill in your current and new password.",
+      "short": "The new password must be at least 8 characters.",
+      "mismatch": "The new passwords don't match."
+    }
   },
   "checkIn": {
     "locating": "Finding your location…",
@@ -281,7 +295,8 @@
     },
     "addedTitle": "Employee added",
     "addedBody": "{{name}} signs in with mobile number {{mobile}} and the password {{password}}. Pass it on now: it is shown only once. Their first sign-in saves their face.",
-    "passwordNote": "After saving, you'll see their first password once, to pass on to them."
+    "passwordNote": "After saving, you'll see their first password once, to pass on to them.",
+    "departmentFirst": "Choose a department first"
   },
   "org": {
     "reports_one": "{{count}} report",

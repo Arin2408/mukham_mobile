@@ -93,13 +93,16 @@ export async function getFormOptions() {
     >('/shifts'),
     api<{ location_id: number; location_name: string }[]>('/locations'),
   ]);
+  // Each designation and shift remembers its department, so the employee
+  // form offers only those of the chosen department; each department its office.
   return {
-    departments: departments.map((d): Option => ({ id: d.department_id, name: departmentLabel(d, locations) })),
-    designations: designations.map((d): Option => ({
+    departments: departments.map((d) => ({ id: d.department_id, name: departmentLabel(d, locations), locationId: d.location_id })),
+    designations: designations.map((d) => ({
       id: d.designation_id,
       name: designationLabel(d, departments, locations),
+      departmentId: d.department_id,
     })),
-    shifts: shifts.map((s): Option => ({ id: s.shift_id, name: shiftLabel(s, departments, locations) })),
+    shifts: shifts.map((s) => ({ id: s.shift_id, name: shiftLabel(s, departments, locations), departmentId: s.department_id })),
     locations: locations.map((l): Option => ({ id: l.location_id, name: l.location_name })),
   };
 }

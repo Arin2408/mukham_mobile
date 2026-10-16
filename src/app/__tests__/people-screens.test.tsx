@@ -95,10 +95,22 @@ const PEOPLE = [
 ];
 
 const OPTIONS = {
-  departments: [{ id: 1, name: 'Sales' }],
-  designations: [{ id: 1, name: 'Executive' }],
-  shifts: [{ id: 1, name: 'Day (09:00 - 18:00)' }],
-  locations: [{ id: 1, name: 'HQ' }],
+  departments: [
+    { id: 1, name: 'Sales', locationId: 1 },
+    { id: 2, name: 'IT', locationId: 2 },
+  ],
+  designations: [
+    { id: 1, name: 'Executive', departmentId: 1 },
+    { id: 2, name: 'Developer', departmentId: 2 },
+  ],
+  shifts: [
+    { id: 1, name: 'Day (09:00 - 18:00)', departmentId: 1 },
+    { id: 2, name: 'IT day (10:00 - 19:00)', departmentId: 2 },
+  ],
+  locations: [
+    { id: 1, name: 'HQ' },
+    { id: 2, name: 'Tech park' },
+  ],
 };
 
 const pressAlertButton = (label: string) =>
@@ -172,6 +184,42 @@ describe('adding and editing an employee', () => {
     );
     await waitFor(() => expect(alert).toHaveBeenCalledWith('Employee added', expect.stringContaining('secret-1'), expect.any(Array)));
     expect(mockBack).toHaveBeenCalled();
+  });
+
+  it("offers only the chosen department's designations and shifts, and its office", async () => {
+    mock.createEmployee.mockResolvedValue(person(9, 'Arjun', 'Das'));
+    await show(<PersonFormScreen />);
+    await screen.findByLabelText('First name');
+
+    // Nothing to choose before a department is.
+    await fireEvent.press(screen.getByLabelText('Designation'));
+    expect(screen.queryByText('Developer')).toBeNull();
+    expect(screen.queryByText('Executive')).toBeNull();
+    await fireEvent.press(screen.getAllByText('Choose a department first').at(-1)!);
+
+    await fireEvent.press(screen.getByLabelText('Department'));
+    await fireEvent.press(screen.getByText('IT'));
+    await fireEvent.press(screen.getByLabelText('Designation'));
+    expect(screen.getByText('Developer')).toBeTruthy();
+    expect(screen.queryByText('Executive')).toBeNull();
+    await fireEvent.press(screen.getByText('Developer'));
+    await fireEvent.press(screen.getByLabelText('Shift'));
+    expect(screen.queryByText('Day (09:00 - 18:00)')).toBeNull();
+    await fireEvent.press(screen.getByText('IT day (10:00 - 19:00)'));
+
+    // Moving to Sales drops IT's designation and shift, and picks Sales' office.
+    await fireEvent.press(screen.getByLabelText('Department'));
+    await fireEvent.press(screen.getByText('Sales'));
+    await fireEvent.changeText(screen.getByLabelText('First name'), 'Arjun');
+    await fireEvent.changeText(screen.getByLabelText('Mobile number'), '9876543210');
+    await fireEvent.changeText(screen.getByLabelText('Email'), 'arjun@example.com');
+    await fireEvent.press(screen.getByText('Save'));
+
+    await waitFor(() =>
+      expect(mock.createEmployee).toHaveBeenCalledWith(
+        expect.objectContaining({ department: 1, designation: null, shift: null, office_location: 1 }),
+      ),
+    );
   });
 
   it('edits an existing employee and shows server refusals', async () => {

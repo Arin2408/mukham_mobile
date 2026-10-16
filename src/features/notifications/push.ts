@@ -116,6 +116,11 @@ export async function unregisterFromPush(): Promise<void> {
   await SecureStore.deleteItemAsync(TOKEN_KEY);
 }
 
+/** This phone's push address, if it has given one to the server. */
+export async function savedPushToken(): Promise<string | null> {
+  return Platform.OS === 'web' ? null : SecureStore.getItemAsync(TOKEN_KEY);
+}
+
 export async function wasPushAsked(): Promise<boolean> {
   return Platform.OS === 'web' || (await SecureStore.getItemAsync(ASKED_KEY)) === 'yes';
 }

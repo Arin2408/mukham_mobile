@@ -1,7 +1,8 @@
-import { cleanMobile, submitLivenessResult } from '@/api/auth';
+import { changePassword, cleanMobile, submitLivenessResult } from '@/api/auth';
 import { api } from '@/api/client';
 
 jest.mock('@/api/client', () => ({ api: jest.fn() }));
+jest.mock('@/api/tokens', () => ({ tokenStore: { getRefresh: async () => 'this-phone-refresh' } }));
 
 const apiMock = api as jest.Mock;
 
@@ -48,6 +49,22 @@ describe('submitLivenessResult', () => {
       method: 'POST',
       token: 'pre-token',
       body: { session_id: 'sess-9', mobile_number: '9876543210', mode: 'register' },
+    });
+  });
+});
+
+describe('changePassword', () => {
+  it("sends this phone's session and push address, so only other devices are signed out", async () => {
+    apiMock.mockResolvedValueOnce({ message: 'Password changed.' });
+    await changePassword('old-pass', 'new-pass-1', 'ExponentPushToken[abc]');
+    expect(apiMock).toHaveBeenCalledWith('/auth/change-password', {
+      method: 'POST',
+      body: {
+        current_password: 'old-pass',
+        new_password: 'new-pass-1',
+        refresh: 'this-phone-refresh',
+        push_token: 'ExponentPushToken[abc]',
+      },
     });
   });
 });

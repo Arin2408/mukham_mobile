@@ -39,6 +39,7 @@ export default function AdminLayout() {
       <Stack.Screen name="setup/offices" options={{ ...withHeader, title: t('setup.offices') }} />
       <Stack.Screen name="setup/office" options={withHeader} />
       <Stack.Screen name="setup/profile" options={{ ...withHeader, title: t('setup.profile') }} />
+      <Stack.Screen name="setup/password" options={{ ...withHeader, title: t('account.changePassword') }} />
     </Stack>
   );
 }

@@ -57,6 +57,11 @@ export default function AdminSetupScreen() {
         onPress={() => router.push('/setup/offices')}
       />
       <LinkRow title={t('setup.profile')} detail={t('setup.profileDetail')} onPress={() => router.push('/setup/profile')} />
+      <LinkRow
+        title={t('account.changePassword')}
+        detail={t('account.changePasswordDetail')}
+        onPress={() => router.push('/setup/password')}
+      />
       <AppearanceCard />
       <ServerStatus />
       <SignOutSection />

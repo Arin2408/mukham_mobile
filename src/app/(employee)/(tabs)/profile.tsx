@@ -7,6 +7,7 @@ import { getMyProfile } from '@/api/attendance';
 import { mediaUrl } from '@/api/config';
 import { Avatar } from '@/components/avatar';
 import { Button } from '@/components/button';
+import { LinkRow } from '@/components/link-row';
 import { Screen } from '@/components/screen';
 import { AppearanceCard } from '@/components/ui/appearance-card';
 import { SignOutSection } from '@/components/sign-out-section';
@@ -66,6 +67,11 @@ export default function ProfileScreen() {
           <Button label={t('profile.showIdCard')} onPress={() => router.push('/id-card')} />
         </>
       )}
+      <LinkRow
+        title={t('account.changePassword')}
+        detail={t('account.changePasswordDetail')}
+        onPress={() => router.push('/change-password')}
+      />
       <AppearanceCard />
       <NotificationSettings />
       <SignOutSection />

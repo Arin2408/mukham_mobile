@@ -70,13 +70,13 @@ describe('people server calls', () => {
     });
     const options = await getFormOptions();
     expect(options.departments).toEqual([
-      { id: 1, name: 'Sales · HQ' },
-      { id: 2, name: 'Sales · Pune' },
+      { id: 1, name: 'Sales · HQ', locationId: 4 },
+      { id: 2, name: 'Sales · Pune', locationId: 5 },
     ]);
-    expect(options.designations).toEqual([{ id: 7, name: 'Manager · Sales · Pune' }]);
+    expect(options.designations).toEqual([{ id: 7, name: 'Manager · Sales · Pune', departmentId: 2 }]);
     expect(options.shifts).toEqual([
-      { id: 3, name: 'Night 20:00 - 04:00 · Sales · HQ' },
-      { id: 6, name: 'Night 20:00 - 04:00 · Sales · Pune' },
+      { id: 3, name: 'Night 20:00 - 04:00 · Sales · HQ', departmentId: 1 },
+      { id: 6, name: 'Night 20:00 - 04:00 · Sales · Pune', departmentId: 2 },
     ]);
   });
 });

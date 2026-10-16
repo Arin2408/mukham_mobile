@@ -157,3 +157,24 @@ export async function signOutOnServer(): Promise<void> {
 export function verifySession() {
   return api<{ valid: boolean; role: string }>('/auth/verify');
 }
+
+// --------------------------------------------------
+// Signed in: change your own password
+// --------------------------------------------------
+
+/**
+ * The admin's sign-in password, or the employee's. The server signs every
+ * other phone and browser out; this phone stays signed in (it sends its
+ * refresh token) and keeps its notifications (its push address).
+ */
+export async function changePassword(currentPassword: string, newPassword: string, pushToken: string | null) {
+  return api<{ message: string }>('/auth/change-password', {
+    method: 'POST',
+    body: {
+      current_password: currentPassword,
+      new_password: newPassword,
+      refresh: await tokenStore.getRefresh(),
+      push_token: pushToken,
+    },
+  });
+}

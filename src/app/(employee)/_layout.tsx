@@ -1,14 +1,16 @@
 import { Stack } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import { usePushSetup } from '@/features/notifications/use-push-setup';
 import { fonts, useTheme } from '@/theme';
 
 /**
  * The employee's area: the tabs, plus screens on top of them: check-in,
- * a task's details and the ID card.
+ * a task's details, the ID card and changing the password.
  */
 export default function EmployeeLayout() {
   const { colors } = useTheme();
+  const { t } = useTranslation();
   usePushSetup();
 
   return (
@@ -31,6 +33,17 @@ export default function EmployeeLayout() {
       />
       <Stack.Screen name="id-card" options={{ presentation: 'modal' }} />
       <Stack.Screen name="notifications-intro" options={{ presentation: 'modal' }} />
+      <Stack.Screen
+        name="change-password"
+        options={{
+          headerShown: true,
+          title: t('account.changePassword'),
+          headerStyle: { backgroundColor: colors.background },
+          headerTintColor: colors.text,
+          headerTitleStyle: { fontFamily: fonts.semibold },
+          headerShadowVisible: false,
+        }}
+      />
     </Stack>
   );
 }
