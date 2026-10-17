@@ -79,12 +79,6 @@
     "register": "Register your organisation",
     "failed": "Invalid mobile number or password."
   },
-  "server": {
-    "checking": "Checking the server…",
-    "connected": "Connected to the server",
-    "unreachable": "Can't reach the server",
-    "address": "Server: {{url}}"
-  },
   "update": {
     "title": "Update required",
     "body": "This version of Mukham ({{current}}) is no longer supported. Please install version {{required}} or newer.",

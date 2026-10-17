@@ -6,7 +6,6 @@ import { getDepartments, getDesignations, getOffices, getShifts } from '@/api/se
 import { LinkRow } from '@/components/link-row';
 import { Screen } from '@/components/screen';
 import { AppearanceCard } from '@/components/ui/appearance-card';
-import { ServerStatus } from '@/components/server-status';
 import { SignOutSection } from '@/components/sign-out-section';
 
 /** Setup: everything an admin sets up once. */
@@ -63,7 +62,6 @@ export default function AdminSetupScreen() {
         onPress={() => router.push('/setup/password')}
       />
       <AppearanceCard />
-      <ServerStatus />
       <SignOutSection />
     </Screen>
   );

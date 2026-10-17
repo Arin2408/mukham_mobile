@@ -11,8 +11,12 @@
     },
     "preview": {
       "distribution": "internal",
+      "environment": "preview",
       "android": { "buildType": "apk" },
-      "env": { "EXPO_PUBLIC_API_URL": "https://STAGING-SERVER/api/v1" }
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://STAGING-SERVER/api/v1",
+        "EXPO_PUBLIC_WEB_URL": "https://STAGING-WEB"
+      }
     },
     "production": {
       "autoIncrement": true

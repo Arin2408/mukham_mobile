@@ -23,13 +23,3 @@ export function useAppConfig() {
 
   return { ...query, minVersion, updateRequired };
 }
-
-/** Whether the server (and its database) answers. Re-checked every 30 s. */
-export function useServerStatus() {
-  return useQuery({
-    queryKey: ['server-status'],
-    queryFn: () => api<{ status: string; database: boolean }>('/health/db', { auth: false }),
-    refetchInterval: 30_000,
-    retry: false,
-  });
-}
