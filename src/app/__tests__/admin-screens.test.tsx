@@ -102,6 +102,39 @@ describe('admin dashboard', () => {
     expect(screen.getByText('No designation')).toBeTruthy();
   });
 
+  const NEW_ORG = {
+    total_employees: 0,
+    active_shifts: 0,
+    office_locations: 1,
+    attendance_score: 0,
+    roles: [],
+    weekly_attendance: [],
+    leaderboard: [],
+    setup: { locations: 1, departments: 1, designations: 0, shifts: 0, employees: 0, faces: 0 },
+  };
+
+  it('shows the setup checklist, each step opening its screen', async () => {
+    mockSummary.mockResolvedValue(NEW_ORG);
+    await show(<AdminDashboardScreen />);
+
+    expect(await screen.findByText('Finish setting up Mukham')).toBeTruthy();
+    expect(screen.getByText('2 of 6 done')).toBeTruthy();
+    fireEvent.press(screen.getByText('Add a designation'));
+    expect(mockPush).toHaveBeenCalledWith('/setup/designations');
+    expect(screen.getByText('Add your first employee')).toBeTruthy();
+  });
+
+  it('hides the setup checklist once every step is done', async () => {
+    mockSummary.mockResolvedValue({
+      ...NEW_ORG,
+      setup: { locations: 1, departments: 1, designations: 1, shifts: 1, employees: 1, faces: 1 },
+    });
+    await show(<AdminDashboardScreen />);
+
+    expect(await screen.findByText('Office locations')).toBeTruthy();
+    expect(screen.queryByText('Finish setting up Mukham')).toBeNull();
+  });
+
   it('says so when offline', async () => {
     mockSummary.mockRejectedValue(ApiError.network());
     await show(<AdminDashboardScreen />);

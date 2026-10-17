@@ -23,9 +23,9 @@ describe('Phase 4 server calls', () => {
     expect(apiMock).toHaveBeenCalledWith('/tasks/7/status', { method: 'PATCH', body: { status: 'completed' } });
   });
 
-  it('reads the ID card without the token, and links the QR code to the web /verify page', async () => {
+  it('reads the ID card signed in, and links the QR code to /verify with the private card code', async () => {
     await getIdCard(42);
-    expect(apiMock).toHaveBeenCalledWith('/employees/42/card', { auth: false });
-    expect(verifyUrl(42)).toBe('https://app.mukham.test/verify/42');
+    expect(apiMock).toHaveBeenCalledWith('/employees/42/card');
+    expect(verifyUrl('42-AbC_d1')).toBe('https://app.mukham.test/verify/42-AbC_d1');
   });
 });

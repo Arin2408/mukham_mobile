@@ -10,6 +10,7 @@ import { StateView } from '@/components/state-view';
 import { Card } from '@/components/ui/card';
 import { FadeIn } from '@/components/ui/motion';
 import { StatTile } from '@/components/ui/stat-tile';
+import { SetupChecklist } from '@/features/dashboard/setup-checklist';
 import { parseDateParam } from '@/lib/format';
 import { fonts, makeStyles, spacing, useTheme } from '@/theme';
 
@@ -29,6 +30,8 @@ export default function AdminDashboardScreen() {
         <StateView kind="error" error={summary.error} onRetry={() => summary.refetch()} />
       ) : (
         <>
+          <SetupChecklist setup={s!.setup} />
+
           <View style={styles.tiles}>
             <StatTile index={1} tone="blue" value={s!.total_employees} label={t('dashboard.employees')} />
             <StatTile index={2} tone="purple" value={s!.attendance_score} suffix="%" label={t('dashboard.score')} />

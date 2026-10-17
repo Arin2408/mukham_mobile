@@ -1,10 +1,22 @@
 import type { HistoryRecord } from './attendance';
 import { api } from './client';
 
+/** How far the organisation has got with setting up (dashboard checklist). */
+export type SetupCounts = {
+  locations: number;
+  departments: number;
+  designations: number;
+  shifts: number;
+  employees: number;
+  /** Employees whose face is registered (at their first sign-in). */
+  faces: number;
+};
+
 export type DashboardSummary = {
   total_employees: number;
   active_shifts: number;
   office_locations: number;
+  setup: SetupCounts;
   /** Average department punctuality, 0-100. */
   attendance_score: number;
   /** Employees per designation, most common first. */

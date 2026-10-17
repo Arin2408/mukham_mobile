@@ -204,7 +204,7 @@ function Back({ card: c }: { card: IdCard }) {
         </View>
 
         <View style={styles.qrBox}>
-          <QrCode value={verifyUrl(c.employee_id)} size={150} />
+          <QrCode value={verifyUrl(c.card_code)} size={150} />
         </View>
 
         <View style={styles.note}>

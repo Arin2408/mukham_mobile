@@ -456,5 +456,22 @@
     "title": "Appearance",
     "dark": "Dark",
     "light": "Light"
+  },
+  "setupChecklist": {
+    "title": "Finish setting up Mukham",
+    "progress": "{{done}} of {{total}} done",
+    "intro": "Complete these steps so your employees can start marking attendance.",
+    "locations": "Add your office location",
+    "locationsHint": "Employees can only check in near it",
+    "departments": "Add a department",
+    "departmentsHint": "For example Sales or Support",
+    "designations": "Add a designation",
+    "designationsHint": "A job title within a department",
+    "shifts": "Add a shift",
+    "shiftsHint": "Working hours, used for late marks",
+    "employees": "Add your first employee",
+    "employeesHint": "Share the password shown after adding",
+    "faces": "Employee registers their face",
+    "facesHint": "Done at their first sign-in on the app"
   }
 }

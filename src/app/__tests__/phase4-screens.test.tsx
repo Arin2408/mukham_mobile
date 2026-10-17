@@ -35,6 +35,7 @@ jest.mock('@/api/tasks', () => ({
 jest.mock('@/api/id-card', () => ({
   getIdCard: async (id: number) => ({
     employee_id: id,
+    card_code: `${id}-AbC_d1`,
     first_name: 'Asha',
     last_name: 'Rao',
     designation_name: 'Engineer',
@@ -42,7 +43,7 @@ jest.mock('@/api/id-card', () => ({
     organisation_name: 'Acme',
     photo: null,
   }),
-  verifyUrl: (id: number) => `https://app.mukham.test/verify/${id}`,
+  verifyUrl: (code: string) => `https://app.mukham.test/verify/${code}`,
 }));
 
 async function show(ui: ReactElement) {
@@ -185,6 +186,6 @@ describe('ID card', () => {
     await fireEvent.press(screen.getByText('Flip'));
     expect(screen.getByText('Scan to verify')).toBeTruthy();
     expect(screen.getByText('Acme')).toBeTruthy(); // Validated by
-    expect(screen.getByLabelText('QR code: https://app.mukham.test/verify/42')).toBeTruthy();
+    expect(screen.getByLabelText('QR code: https://app.mukham.test/verify/42-AbC_d1')).toBeTruthy();
   });
 });
