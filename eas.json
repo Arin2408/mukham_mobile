@@ -14,8 +14,8 @@
       "environment": "preview",
       "android": { "buildType": "apk" },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://STAGING-SERVER/api/v1",
-        "EXPO_PUBLIC_WEB_URL": "https://STAGING-WEB"
+        "EXPO_PUBLIC_API_URL": "https://mukham-fastapi.onrender.com/api/v1",
+        "EXPO_PUBLIC_WEB_URL": "https://mukham1-frontend.vercel.app"
       }
     },
     "production": {
