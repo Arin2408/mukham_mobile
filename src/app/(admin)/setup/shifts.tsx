@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getDepartments, getOffices, getShifts } from '@/api/setup';
-import { Button } from '@/components/button';
+import { Fab, FAB_CLEARANCE } from '@/components/fab';
 import { LinkRow } from '@/components/link-row';
 import { StateView } from '@/components/state-view';
 import { formatDuration } from '@/lib/format';
@@ -60,8 +60,8 @@ export default function ShiftsScreen() {
             />
           ))
         )}
-        <Button label={t('setup.addShift')} onPress={() => router.push('/setup/shift')} />
       </ScrollView>
+      <Fab label={t('setup.addShift')} onPress={() => router.push('/setup/shift')} />
     </SafeAreaView>
   );
 }
@@ -73,6 +73,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   content: {
     padding: spacing.md,
+    paddingBottom: FAB_CLEARANCE,
     gap: spacing.sm,
   },
 }));

@@ -6,7 +6,8 @@ import { fonts, useTheme } from '@/theme';
 
 /**
  * The employee's area: the tabs, plus screens on top of them: check-in,
- * a task's details, the ID card and changing the password.
+ * a task's details, a manager's team task form, the ID card and changing
+ * the password.
  */
 export default function EmployeeLayout() {
   const { colors } = useTheme();
@@ -25,6 +26,17 @@ export default function EmployeeLayout() {
         name="task/[id]"
         options={{
           headerShown: true,
+          headerStyle: { backgroundColor: colors.background },
+          headerTintColor: colors.text,
+          headerTitleStyle: { fontFamily: fonts.semibold },
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
+        name="team-task"
+        options={{
+          headerShown: true,
+          presentation: 'modal',
           headerStyle: { backgroundColor: colors.background },
           headerTintColor: colors.text,
           headerTitleStyle: { fontFamily: fonts.semibold },

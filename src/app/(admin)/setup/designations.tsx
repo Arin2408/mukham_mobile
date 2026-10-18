@@ -8,6 +8,7 @@ import { errorMessage } from '@/api/errors';
 import { addDesignation, getDepartments, getDesignations, getOffices } from '@/api/setup';
 import { Button } from '@/components/button';
 import { ErrorBanner } from '@/components/error-banner';
+import { Fab, FAB_CLEARANCE } from '@/components/fab';
 import { PickerField } from '@/components/picker-field';
 import { StateView } from '@/components/state-view';
 import { TextField } from '@/components/text-field';
@@ -28,12 +29,15 @@ export default function DesignationsScreen() {
   const [name, setName] = useState('');
   const [department, setDepartment] = useState<number | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
+  // The add form opens from the corner button, as on the other lists.
+  const [adding, setAdding] = useState(false);
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['admin'] });
   const add = useMutation({
     mutationFn: () => addDesignation(department!, name.trim()),
     onSuccess: async () => {
       setName('');
+      setAdding(false);
       await refresh();
     },
   });
@@ -65,6 +69,7 @@ export default function DesignationsScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['bottom', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        {adding ? (
         <View style={styles.card}>
           <Text style={text.heading}>{t('setup.addDesignation')}</Text>
           <TextField label={t('setup.designationName')} value={name} onChangeText={setName} />
@@ -72,7 +77,9 @@ export default function DesignationsScreen() {
           {departments.data.length === 0 ? <Text style={text.muted}>{t('setup.needDepartment')}</Text> : null}
           <ErrorBanner message={problem ?? (add.isError ? errorMessage(add.error, t) : null)} />
           <Button label={t('setup.add')} onPress={submit} loading={add.isPending} />
+          <Button label={t('setup.cancel')} variant="secondary" onPress={() => setAdding(false)} />
         </View>
+        ) : null}
 
         {departments.data.map((d) => {
           const mine = designations.data.filter((x) => x.department_id === d.department_id);
@@ -87,6 +94,7 @@ export default function DesignationsScreen() {
           );
         })}
       </ScrollView>
+      {!adding ? <Fab label={t('setup.addDesignation')} onPress={() => setAdding(true)} /> : null}
     </SafeAreaView>
   );
 }
@@ -99,7 +107,7 @@ const useStyles = makeStyles(({ colors, text }) => ({
   content: {
     padding: spacing.md,
     gap: spacing.lg,
-    paddingBottom: spacing.xl,
+    paddingBottom: FAB_CLEARANCE,
   },
   card: {
     backgroundColor: colors.card,

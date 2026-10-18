@@ -18,16 +18,19 @@ jest.mock('expo-router', () => ({
 }));
 
 const mockHistory = jest.fn();
+const mockProfile = jest.fn();
 jest.mock('@/api/attendance', () => ({
   getAttendanceHistory: (from: string, to: string) => mockHistory(from, to),
-  getMyProfile: async () => ({ user_id: 42, first_name: 'Asha', last_name: 'Rao' }),
+  getMyProfile: () => mockProfile(),
 }));
 
 const mockGetTasks = jest.fn();
+const mockGetTeamTasks = jest.fn();
 const mockGetTask = jest.fn();
 const mockSetStatus = jest.fn();
 jest.mock('@/api/tasks', () => ({
   getTasks: (status: string) => mockGetTasks(status),
+  getTeamTasks: (status: string) => mockGetTeamTasks(status),
   getTask: (id: number) => mockGetTask(id),
   setTaskStatus: (id: number, status: string) => mockSetStatus(id, status),
 }));
@@ -56,6 +59,7 @@ async function show(ui: ReactElement) {
 
 const TASK = {
   task_id: 7,
+  employee_id: 42, // the signed-in employee (getMyProfile)
   title: 'Visit the Noida site',
   description: 'Check the new gate.',
   priority: 'high',
@@ -70,6 +74,7 @@ const TASK = {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockProfile.mockResolvedValue({ user_id: 42, first_name: 'Asha', last_name: 'Rao', team_size: 0 });
 });
 
 describe('History', () => {
@@ -140,6 +145,31 @@ describe('Tasks', () => {
     expect(mockPush).toHaveBeenCalledWith({ pathname: '/task/[id]', params: { id: '7' } });
   });
 
+  it('lets a manager see their team\'s tasks, assign one, and edit the ones they assigned', async () => {
+    mockProfile.mockResolvedValue({ user_id: 42, first_name: 'Asha', last_name: 'Rao', team_size: 2 });
+    mockGetTasks.mockResolvedValue([]);
+    mockGetTeamTasks.mockResolvedValue([
+      { ...TASK, task_id: 9, employee_id: 43, employee_name: 'Ravi Sharma', created_by_id: 42 },
+    ]);
+    await show(<TasksScreen />);
+    await screen.findByText('No pending tasks.');
+    expect(screen.queryByRole('button', { name: 'Assign task' })).toBeNull();
+
+    await fireEvent.press(screen.getByText('My team'));
+    expect(await screen.findByText('For Ravi Sharma')).toBeTruthy();
+    expect(mockGetTeamTasks).toHaveBeenCalledWith('pending');
+
+    await fireEvent.press(screen.getByText('Visit the Noida site'));
+    expect(mockPush).toHaveBeenCalledWith({ pathname: '/team-task', params: { id: '9' } });
+  });
+
+  it('shows no team switch to someone nobody reports to', async () => {
+    mockGetTasks.mockResolvedValue([]);
+    await show(<TasksScreen />);
+    await screen.findByText('No pending tasks.');
+    expect(screen.queryByText('My team')).toBeNull();
+  });
+
   it('switches filter and explains an empty list', async () => {
     mockGetTasks.mockResolvedValue([]);
     await show(<TasksScreen />);
@@ -163,6 +193,15 @@ describe('Tasks', () => {
     await waitFor(() =>
       expect(screen.getByRole('tab', { name: 'In progress' })).toBeSelected(),
     );
+  });
+
+  it("shows a team member's task, assigned by the admin, without status buttons", async () => {
+    mockGetTask.mockResolvedValue({ ...TASK, employee_id: 43, created_by_id: 1, assigned_by_name: 'Acme' });
+    await show(<TaskDetailScreen />);
+
+    expect(await screen.findByText('Assigned by Acme')).toBeTruthy();
+    expect(screen.queryByRole('tab', { name: 'In progress' })).toBeNull();
+    expect(screen.getByText('Pending')).toBeTruthy();
   });
 
   it("shows the server's reason when a status change is refused", async () => {

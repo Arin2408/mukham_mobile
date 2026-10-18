@@ -19,6 +19,8 @@ export type EmployeeProfile = {
   shift_end_time: string | null;
   location_name: string | null;
   office_location: OfficeLocation | null;
+  /** People who report to this employee; above 0 means they can assign tasks. */
+  team_size?: number;
   department_name: string | null;
   designation_name: string | null;
   photo: string | null;

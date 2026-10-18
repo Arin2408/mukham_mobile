@@ -208,6 +208,9 @@ describe('designations', () => {
     expect(screen.getByText('Sales · Pune')).toBeTruthy();
     expect(screen.getByText('Executive')).toBeTruthy();
 
+    // The form opens from the corner button, as on the other lists.
+    expect(screen.queryByLabelText('Designation name')).toBeNull();
+    await fireEvent.press(screen.getByRole('button', { name: 'Add designation' }));
     await fireEvent.changeText(screen.getByLabelText('Designation name'), 'Manager');
     await fireEvent.press(screen.getByLabelText('Department'));
     // The picker's option comes before the list's heading of the same name.

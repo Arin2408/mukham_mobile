@@ -59,3 +59,7 @@ GoogleService-Info*.plist
 # Lint cache / Android heap dumps
 .eslintcache
 *.hprof
+
+# Stray logs and Claude Code local settings
+*.log
+.claude/

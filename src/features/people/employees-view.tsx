@@ -7,6 +7,7 @@ import { Alert, Pressable, Text, TextInput, View } from 'react-native';
 
 import { errorMessage } from '@/api/errors';
 import { getEmployees, type Employee } from '@/api/people';
+import { Fab } from '@/components/fab';
 import { ListScreenBody } from '@/components/list-screen';
 import { StateView } from '@/components/state-view';
 import { PressableScale } from '@/components/ui/motion';
@@ -94,14 +95,7 @@ export function EmployeesView() {
           )
         }
       />
-      <PressableScale
-        onPress={() => router.push('/person/form')}
-        accessibilityRole="button"
-        accessibilityLabel={t('people.add')}
-        style={styles.fab}>
-        <Ionicons name="add" size={22} color={colors.primaryText} />
-        <Text style={styles.fabText}>{t('people.add')}</Text>
-      </PressableScale>
+      <Fab label={t('people.add')} onPress={() => router.push('/person/form')} />
     </View>
   );
 }
@@ -188,22 +182,5 @@ const useStyles = makeStyles(({ colors, text }) => ({
   pending: {
     ...text.muted,
     color: colors.warningText,
-  },
-  fab: {
-    position: 'absolute',
-    right: spacing.md,
-    bottom: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    backgroundColor: colors.primary,
-    borderRadius: 999,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm + 4,
-  },
-  fabText: {
-    fontFamily: fonts.semibold,
-    fontSize: 15,
-    color: colors.primaryText,
   },
 }));

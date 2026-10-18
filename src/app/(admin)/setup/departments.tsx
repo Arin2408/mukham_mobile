@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getDepartments, getDesignations, getOffices } from '@/api/setup';
-import { Button } from '@/components/button';
+import { Fab, FAB_CLEARANCE } from '@/components/fab';
 import { LinkRow } from '@/components/link-row';
 import { StateView } from '@/components/state-view';
 import { makeStyles, spacing } from '@/theme';
@@ -52,8 +52,8 @@ export default function DepartmentsScreen() {
             );
           })
         )}
-        <Button label={t('setup.addDepartment')} onPress={() => router.push('/setup/department')} />
       </ScrollView>
+      <Fab label={t('setup.addDepartment')} onPress={() => router.push('/setup/department')} />
     </SafeAreaView>
   );
 }
@@ -65,6 +65,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   content: {
     padding: spacing.md,
+    paddingBottom: FAB_CLEARANCE,
     gap: spacing.sm,
   },
 }));

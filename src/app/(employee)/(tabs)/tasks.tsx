@@ -5,7 +5,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 
-import { getTasks, type Task, type TaskStatus } from '@/api/tasks';
+import { getMyProfile } from '@/api/attendance';
+import { getTasks, getTeamTasks, type Task, type TaskStatus } from '@/api/tasks';
+import { Fab, FAB_CLEARANCE } from '@/components/fab';
 import { ListScreen } from '@/components/list-screen';
 import { Segmented } from '@/components/segmented';
 import { StateView } from '@/components/state-view';
@@ -14,20 +16,44 @@ import { formatDate } from '@/lib/format';
 import { PressableScale } from '@/components/ui/motion';
 import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
+type Scope = 'mine' | 'team';
+
+/** My tasks; a manager also sees, and assigns, their direct reports' tasks. */
 export default function TasksScreen() {
   const { t } = useTranslation();
   const [status, setStatus] = useState<TaskStatus>('pending');
-  const tasks = useQuery({ queryKey: ['tasks', status], queryFn: () => getTasks(status) });
+  const [scope, setScope] = useState<Scope>('mine');
+  const profile = useQuery({ queryKey: ['profile'], queryFn: getMyProfile });
+  const isManager = (profile.data?.team_size ?? 0) > 0;
+  const team = isManager && scope === 'team';
+  const tasks = useQuery({
+    queryKey: team ? ['tasks', 'team', status] : ['tasks', status],
+    queryFn: () => (team ? getTeamTasks(status) : getTasks(status)),
+  });
+  const myId = profile.data?.user_id;
 
   return (
     <ListScreen
       title={t('tasks.title')}
       data={tasks.data ?? []}
       keyExtractor={(task) => String(task.task_id)}
-      renderItem={({ item }) => <TaskRow task={item} />}
+      renderItem={({ item }) => <TaskRow task={item} team={team} mine={item.created_by_id === myId} />}
       refreshing={tasks.isRefetching}
       onRefresh={() => tasks.refetch()}
+      bottomSpace={team ? FAB_CLEARANCE : 0}
+      floating={team ? <Fab label={t('tasks.assignTeam')} onPress={() => router.push('/team-task')} /> : null}
       header={
+        <>
+        {isManager ? (
+          <Segmented
+            value={scope}
+            onChange={setScope}
+            options={[
+              { value: 'mine', label: t('tasks.mine') },
+              { value: 'team', label: t('tasks.myTeam') },
+            ]}
+          />
+        ) : null}
         <Segmented
           value={status}
           onChange={setStatus}
@@ -37,6 +63,7 @@ export default function TasksScreen() {
             { value: 'completed', label: t('tasks.completed') },
           ]}
         />
+        </>
       }
       empty={
         tasks.isPending ? (
@@ -44,26 +71,32 @@ export default function TasksScreen() {
         ) : tasks.isError ? (
           <StateView kind="error" error={tasks.error} onRetry={() => tasks.refetch()} />
         ) : (
-          <StateView kind="empty" message={t(`tasks.empty_${status}`)} />
+          <StateView kind="empty" message={t(team ? `tasks.teamEmpty_${status}` : `tasks.empty_${status}`)} />
         )
       }
     />
   );
 }
 
-function TaskRow({ task }: { task: Task }) {
+function TaskRow({ task, team, mine }: { task: Task; team: boolean; mine: boolean }) {
   const styles = useStyles();
   const { colors, text } = useTheme();
   const { t } = useTranslation();
+  // A manager edits the team tasks they assigned; the admin's are view-only.
+  const open = () =>
+    team && mine
+      ? router.push({ pathname: '/team-task', params: { id: String(task.task_id) } })
+      : router.push({ pathname: '/task/[id]', params: { id: String(task.task_id) } });
   return (
     <PressableScale
-      onPress={() => router.push({ pathname: '/task/[id]', params: { id: String(task.task_id) } })}
+      onPress={open}
       accessibilityRole="button"
       style={styles.row}>
       <View style={styles.body}>
         <Text style={styles.title} numberOfLines={2}>
           {task.title}
         </Text>
+        {team ? <Text style={text.muted}>{t('tasks.forPerson', { name: task.employee_name })}</Text> : null}
         <Text style={text.muted}>
           {task.due_date ? t('tasks.due', { date: formatDate(task.due_date) }) : t('tasks.noDue')}
         </Text>

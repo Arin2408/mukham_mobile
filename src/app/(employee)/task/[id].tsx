@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { getMyProfile } from '@/api/attendance';
 import { errorMessage } from '@/api/errors';
 import { getTask, setTaskStatus, type Task, type TaskStatus } from '@/api/tasks';
 import { ErrorBanner } from '@/components/error-banner';
@@ -21,6 +22,8 @@ export default function TaskDetailScreen() {
   const queryClient = useQueryClient();
 
   const task = useQuery({ queryKey: ['task', taskId], queryFn: () => getTask(taskId) });
+  const profile = useQuery({ queryKey: ['profile'], queryFn: getMyProfile });
+  const myId = profile.data?.user_id;
 
   const change = useMutation({
     mutationFn: (status: TaskStatus) => setTaskStatus(taskId, status),
@@ -41,6 +44,9 @@ export default function TaskDetailScreen() {
       ) : (
         <TaskBody
           task={task.data}
+          // The assignee, or whoever assigned it; a manager only views the
+          // admin's tasks for their team.
+          canChangeStatus={myId != null && (task.data.employee_id === myId || task.data.created_by_id === myId)}
           onChange={(status) => change.mutate(status)}
           saving={change.isPending}
           error={change.isError ? errorMessage(change.error, t) : null}
@@ -52,12 +58,13 @@ export default function TaskDetailScreen() {
 
 type BodyProps = {
   task: Task;
+  canChangeStatus: boolean;
   onChange: (status: TaskStatus) => void;
   saving: boolean;
   error: string | null;
 };
 
-function TaskBody({ task, onChange, saving, error }: BodyProps) {
+function TaskBody({ task, canChangeStatus, onChange, saving, error }: BodyProps) {
   const styles = useStyles();
   const { text } = useTheme();
   const { t } = useTranslation();
@@ -73,6 +80,9 @@ function TaskBody({ task, onChange, saving, error }: BodyProps) {
         {task.title}
       </Text>
       <TaskPills task={task} />
+      {task.assigned_by_name ? (
+        <Text style={text.muted}>{t('tasks.assignedBy', { name: task.assigned_by_name })}</Text>
+      ) : null}
 
       {task.description ? <Text style={styles.description}>{task.description}</Text> : null}
 
@@ -88,6 +98,9 @@ function TaskBody({ task, onChange, saving, error }: BodyProps) {
       </View>
 
       <Text style={styles.section}>{t('tasks.status')}</Text>
+      {!canChangeStatus ? (
+        <Text style={text.body}>{t(task.status === 'in_progress' ? 'tasks.inProgress' : `tasks.${task.status}`)}</Text>
+      ) : (
       <View style={saving && styles.saving} pointerEvents={saving ? 'none' : 'auto'}>
         <Segmented
           value={task.status}
@@ -99,6 +112,7 @@ function TaskBody({ task, onChange, saving, error }: BodyProps) {
           ]}
         />
       </View>
+      )}
       <ErrorBanner message={error} />
     </ScrollView>
   );

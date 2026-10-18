@@ -21,13 +21,15 @@ type Props<T> = {
   onRefresh?: () => void;
   /** Extra space under the last row, e.g. for a floating button. */
   bottomSpace?: number;
+  /** Drawn over the list, e.g. a Fab in the corner (ListScreen only). */
+  floating?: ReactNode;
 };
 
 /**
  * Screen for long lists: like Screen, but the rows are virtualised, so
  * months of history stay smooth on a low-end phone.
  */
-export function ListScreen<T>({ title, header, ...rest }: Props<T>) {
+export function ListScreen<T>({ title, header, floating, ...rest }: Props<T>) {
   const styles = useStyles();
   const { text } = useTheme();
   return (
@@ -48,6 +50,7 @@ export function ListScreen<T>({ title, header, ...rest }: Props<T>) {
           </>
         }
       />
+      {floating}
     </SafeAreaView>
   );
 }
@@ -62,7 +65,7 @@ export function ListScreenBody<T>({
   refreshing,
   onRefresh,
   bottomSpace = 0,
-}: Omit<Props<T>, 'title'>) {
+}: Omit<Props<T>, 'title' | 'floating'>) {
   const styles = useStyles();
   const { colors } = useTheme();
   return (

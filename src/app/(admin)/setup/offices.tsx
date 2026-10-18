@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { getOffices } from '@/api/setup';
-import { Button } from '@/components/button';
+import { Fab, FAB_CLEARANCE } from '@/components/fab';
 import { LinkRow } from '@/components/link-row';
 import { StateView } from '@/components/state-view';
 import { formatDistance } from '@/lib/format';
@@ -40,8 +40,8 @@ export default function OfficesScreen() {
             />
           ))
         )}
-        <Button label={t('setup.addOffice')} onPress={() => router.push('/setup/office')} />
       </ScrollView>
+      <Fab label={t('setup.addOffice')} onPress={() => router.push('/setup/office')} />
     </SafeAreaView>
   );
 }
@@ -53,6 +53,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   content: {
     padding: spacing.md,
+    paddingBottom: FAB_CLEARANCE,
     gap: spacing.sm,
   },
 }));

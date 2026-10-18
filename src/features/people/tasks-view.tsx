@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, View } from 'react-native';
 
 import { getOrgTasks, type Task } from '@/api/tasks';
+import { Fab, FAB_CLEARANCE } from '@/components/fab';
 import { monthWeeks, MonthGrid } from '@/components/month-grid';
 import { StateView } from '@/components/state-view';
 import { TaskPills } from '@/features/tasks/task-pills';
@@ -21,7 +22,6 @@ export function tasksOn(tasks: Task[], day: string): Task[] {
 /** People › Tasks: a month calendar; tap a day for its tasks. */
 export function TasksView() {
   const styles = useStyles();
-  const { colors } = useTheme();
   const { t } = useTranslation();
   const [month, setMonth] = useState(() => new Date());
   const [selected, setSelected] = useState(() => toDateParam(new Date()));
@@ -70,14 +70,10 @@ export function TasksView() {
           onDay.map((task) => <TaskRow key={task.task_id} task={task} />)
         )}
       </ScrollView>
-      <PressableScale
+      <Fab
+        label={t('adminTasks.assign')}
         onPress={() => router.push({ pathname: '/task-form', params: { date: selected } })}
-        accessibilityRole="button"
-        accessibilityLabel={t('adminTasks.assign')}
-        style={styles.fab}>
-        <Ionicons name="add" size={22} color={colors.primaryText} />
-        <Text style={styles.fabText}>{t('adminTasks.assign')}</Text>
-      </PressableScale>
+      />
     </View>
   );
 }
@@ -119,7 +115,7 @@ const useStyles = makeStyles(({ colors, text }) => ({
   content: {
     padding: spacing.md,
     paddingTop: 0,
-    paddingBottom: 96,
+    paddingBottom: FAB_CLEARANCE,
     gap: spacing.sm,
   },
   day: {
@@ -147,22 +143,5 @@ const useStyles = makeStyles(({ colors, text }) => ({
     fontFamily: fonts.semibold,
     fontSize: 16,
     color: colors.text,
-  },
-  fab: {
-    position: 'absolute',
-    right: spacing.md,
-    bottom: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    backgroundColor: colors.primary,
-    borderRadius: 999,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm + 4,
-  },
-  fabText: {
-    fontFamily: fonts.semibold,
-    fontSize: 15,
-    color: colors.primaryText,
   },
 }));

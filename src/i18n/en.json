@@ -51,7 +51,17 @@
     "assigned": "Assigned",
     "dueLabel": "Due",
     "completedOn": "Completed",
-    "status": "Status"
+    "status": "Status",
+    "mine": "Mine",
+    "myTeam": "My team",
+    "assignTeam": "Assign task",
+    "teamEmpty_pending": "No pending tasks in your team.",
+    "teamEmpty_in_progress": "Nothing in progress in your team.",
+    "teamEmpty_completed": "No completed team tasks yet.",
+    "assignedBy": "Assigned by {{name}}",
+    "forPerson": "For {{name}}",
+    "teamTaskTitle": "Team task",
+    "noTeam": "Nobody reports to you yet. Your admin sets managers in the org chart."
   },
   "profile": {
     "title": "Profile",
@@ -425,7 +435,8 @@
     "addDesignation": "Add designation",
     "designationName": "Designation name",
     "needDepartment": "Add a department first: every designation belongs to one.",
-    "designationsAfterSave": "After saving, you can add this department's designations here or in Setup › Designations."
+    "designationsAfterSave": "After saving, you can add this department's designations here or in Setup › Designations.",
+    "cancel": "Cancel"
   },
   "push": {
     "introTitle": "Get reminders?",
