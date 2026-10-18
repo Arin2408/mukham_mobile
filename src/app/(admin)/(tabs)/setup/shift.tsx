@@ -41,7 +41,7 @@ export default function ShiftScreen() {
   const ready = shifts.data && departments.data && offices.data && (shiftId == null || existing);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
       <Stack.Screen options={{ title: existing ? existing.shift_name : t('setup.addShift') }} />
       {failed ? (
         <StateView

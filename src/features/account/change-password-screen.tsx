@@ -47,7 +47,7 @@ export function ChangePasswordScreen() {
   const passwordProps = { secureTextEntry: true, autoCapitalize: 'none', autoCorrect: false, maxLength: 128 } as const;
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <TextField
           label={t('account.currentPassword')}

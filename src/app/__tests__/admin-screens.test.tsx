@@ -5,9 +5,9 @@ import { Alert } from 'react-native';
 
 import '@/i18n';
 
-import AdminAttendanceScreen from '@/app/(admin)/(tabs)/attendance';
+import AdminAttendanceScreen from '@/app/(admin)/(tabs)/attendance/index';
 import AdminDashboardScreen from '@/app/(admin)/(tabs)/dashboard';
-import EmployeeAttendanceScreen from '@/app/(admin)/employee/[id]';
+import EmployeeAttendanceScreen from '@/app/(admin)/(tabs)/attendance/[id]';
 import { ApiError } from '@/api/errors';
 
 const mockPush = jest.fn();
@@ -173,7 +173,7 @@ describe('admin attendance', () => {
     expect(screen.queryByText('Imran Khan')).toBeNull();
 
     await fireEvent.press(screen.getByText('Asha Rao'));
-    expect(mockPush).toHaveBeenCalledWith({ pathname: '/employee/[id]', params: { id: '5' } });
+    expect(mockPush).toHaveBeenCalledWith({ pathname: '/attendance/[id]', params: { id: '5' } });
 
     await fireEvent.changeText(screen.getByLabelText('Search by name or mobile'), 'nobody');
     expect(screen.getByText('No employee matches your search.')).toBeTruthy();

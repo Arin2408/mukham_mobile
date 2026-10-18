@@ -58,7 +58,7 @@ export default function PersonScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
       <Stack.Screen options={{ title: name }} />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.identity}>

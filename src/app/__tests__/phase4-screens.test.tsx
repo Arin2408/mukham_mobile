@@ -5,9 +5,9 @@ import type { ReactElement, ReactNode } from 'react';
 import '@/i18n';
 
 import HistoryScreen from '@/app/(employee)/(tabs)/history';
-import TasksScreen from '@/app/(employee)/(tabs)/tasks';
+import TasksScreen from '@/app/(employee)/(tabs)/tasks/index';
 import IdCardScreen from '@/app/(employee)/id-card';
-import TaskDetailScreen from '@/app/(employee)/task/[id]';
+import TaskDetailScreen from '@/app/(employee)/(tabs)/tasks/[id]';
 import { ApiError } from '@/api/errors';
 
 const mockPush = jest.fn();
@@ -142,7 +142,7 @@ describe('Tasks', () => {
     expect(screen.getByText('Overdue')).toBeTruthy();
 
     await fireEvent.press(screen.getByText('Visit the Noida site'));
-    expect(mockPush).toHaveBeenCalledWith({ pathname: '/task/[id]', params: { id: '7' } });
+    expect(mockPush).toHaveBeenCalledWith({ pathname: '/tasks/[id]', params: { id: '7' } });
   });
 
   it('lets a manager see their team\'s tasks, assign one, and edit the ones they assigned', async () => {

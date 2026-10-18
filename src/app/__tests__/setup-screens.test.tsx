@@ -5,10 +5,10 @@ import { Alert } from 'react-native';
 
 import '@/i18n';
 
-import DepartmentScreen from '@/app/(admin)/setup/department';
-import DesignationsScreen from '@/app/(admin)/setup/designations';
-import OfficeScreen from '@/app/(admin)/setup/office';
-import ShiftScreen from '@/app/(admin)/setup/shift';
+import DepartmentScreen from '@/app/(admin)/(tabs)/setup/department';
+import DesignationsScreen from '@/app/(admin)/(tabs)/setup/designations';
+import OfficeScreen from '@/app/(admin)/(tabs)/setup/office';
+import ShiftScreen from '@/app/(admin)/(tabs)/setup/shift';
 import { ApiError } from '@/api/errors';
 
 const mockBack = jest.fn();

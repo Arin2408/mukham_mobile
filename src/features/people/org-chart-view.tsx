@@ -73,7 +73,7 @@ export function OrgChartView() {
       { text: t('org.changeManager'), onPress: () => setMoving(person) },
       {
         text: t('org.openProfile'),
-        onPress: () => router.push({ pathname: '/person/[id]', params: { id: String(person.employee_id) } }),
+        onPress: () => router.push({ pathname: '/people/[id]', params: { id: String(person.employee_id) } }),
       },
       { text: t('checkIn.cancel'), style: 'cancel' },
     ]);

@@ -118,7 +118,7 @@ const EmployeeRow = memo(function EmployeeRow({ row }: { row: Row }) {
 
   return (
     <PressableScale
-      onPress={() => router.push({ pathname: '/employee/[id]', params: { id: String(e.employee_id) } })}
+      onPress={() => router.push({ pathname: '/attendance/[id]', params: { id: String(e.employee_id) } })}
       accessibilityRole="button"
       style={styles.row}>
       <View style={styles.body}>

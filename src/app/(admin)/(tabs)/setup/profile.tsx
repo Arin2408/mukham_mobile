@@ -21,7 +21,7 @@ export default function OrgProfileScreen() {
   const profile = useQuery({ queryKey: ['admin', 'org-profile'], queryFn: getOrgProfile });
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
       {profile.isPending ? (
         <StateView kind="loading" />
       ) : profile.isError ? (

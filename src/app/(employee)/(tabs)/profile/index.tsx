@@ -70,7 +70,7 @@ export default function ProfileScreen() {
       <LinkRow
         title={t('account.changePassword')}
         detail={t('account.changePasswordDetail')}
-        onPress={() => router.push('/change-password')}
+        onPress={() => router.push('/profile/change-password')}
       />
       <AppearanceCard />
       <NotificationSettings />

@@ -6,7 +6,7 @@ import { Alert } from 'react-native';
 import '@/i18n';
 
 import PersonFormScreen from '@/app/(admin)/person/form';
-import PersonScreen from '@/app/(admin)/person/[id]';
+import PersonScreen from '@/app/(admin)/(tabs)/people/[id]';
 import TaskFormScreen from '@/app/(admin)/task-form';
 import { ApiError } from '@/api/errors';
 import { EmployeesView } from '@/features/people/employees-view';

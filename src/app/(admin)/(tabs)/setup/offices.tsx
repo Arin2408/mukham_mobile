@@ -18,7 +18,7 @@ export default function OfficesScreen() {
   const offices = useQuery({ queryKey: ['admin', 'offices'], queryFn: getOffices });
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
       <ScrollView contentContainerStyle={styles.content}>
         {offices.isPending ? (
           <StateView kind="loading" />

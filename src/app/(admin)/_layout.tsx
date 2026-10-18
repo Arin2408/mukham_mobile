@@ -1,24 +1,16 @@
 import { Stack } from 'expo-router';
-import { useTranslation } from 'react-i18next';
 
-import { fonts, useTheme } from '@/theme';
-
+import { useStackHeader } from '@/components/stack-header';
+import { useTheme } from '@/theme';
 
 /**
- * The admin's area: the tabs, plus screens on top of them: one employee's
- * attendance, an employee's page, the ID card, the employee and task forms,
- * and the Setup screens.
+ * The admin's area: the tabs (each with its own pages under the tab bar),
+ * plus forms that open over everything: the employee and task forms and the
+ * ID card.
  */
 export default function AdminLayout() {
   const { colors } = useTheme();
-  const { t } = useTranslation();
-  const withHeader = {
-    headerShown: true,
-    headerStyle: { backgroundColor: colors.background },
-    headerTintColor: colors.text,
-    headerTitleStyle: { fontFamily: fonts.semibold },
-    headerShadowVisible: false,
-  };
+  const header = useStackHeader();
   return (
     <Stack
       screenOptions={{
@@ -26,20 +18,9 @@ export default function AdminLayout() {
         contentStyle: { backgroundColor: colors.background },
       }}>
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="employee/[id]" options={withHeader} />
-      <Stack.Screen name="person/[id]" options={withHeader} />
-      <Stack.Screen name="person/form" options={{ ...withHeader, presentation: 'modal' }} />
+      <Stack.Screen name="person/form" options={{ ...header, presentation: 'modal' }} />
       <Stack.Screen name="person/card" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="task-form" options={{ ...withHeader, presentation: 'modal' }} />
-      <Stack.Screen name="setup/departments" options={{ ...withHeader, title: t('setup.departments') }} />
-      <Stack.Screen name="setup/department" options={withHeader} />
-      <Stack.Screen name="setup/designations" options={{ ...withHeader, title: t('setup.designations') }} />
-      <Stack.Screen name="setup/shifts" options={{ ...withHeader, title: t('setup.shifts') }} />
-      <Stack.Screen name="setup/shift" options={withHeader} />
-      <Stack.Screen name="setup/offices" options={{ ...withHeader, title: t('setup.offices') }} />
-      <Stack.Screen name="setup/office" options={withHeader} />
-      <Stack.Screen name="setup/profile" options={{ ...withHeader, title: t('setup.profile') }} />
-      <Stack.Screen name="setup/password" options={{ ...withHeader, title: t('account.changePassword') }} />
+      <Stack.Screen name="task-form" options={{ ...header, presentation: 'modal' }} />
     </Stack>
   );
 }

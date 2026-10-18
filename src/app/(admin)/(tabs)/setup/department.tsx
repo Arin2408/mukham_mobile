@@ -38,7 +38,7 @@ export default function DepartmentScreen() {
   const ready = departments.data && offices.data && (departmentId == null || existing);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
       <Stack.Screen options={{ title: existing ? existing.details : t('setup.addDepartment') }} />
       {failed ? (
         <StateView kind="error" error={failed} onRetry={() => {

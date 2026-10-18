@@ -107,7 +107,7 @@ const EmployeeRow = memo(function EmployeeRow({ employee: e }: { employee: Emplo
   const role = [e.designation_name, e.department_name].filter((v) => v && v !== 'N/A').join(' · ');
   return (
     <PressableScale
-      onPress={() => router.push({ pathname: '/person/[id]', params: { id: String(e.employee_id) } })}
+      onPress={() => router.push({ pathname: '/people/[id]', params: { id: String(e.employee_id) } })}
       accessibilityRole="button"
       style={styles.row}>
       <View style={styles.body}>

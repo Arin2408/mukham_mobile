@@ -35,7 +35,7 @@ export default function OfficeScreen() {
   const existing = offices.data?.find((o) => o.location_id === officeId);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
       <Stack.Screen options={{ title: existing ? existing.location_name : t('setup.addOffice') }} />
       {offices.isError ? (
         <StateView kind="error" error={offices.error} onRetry={() => offices.refetch()} />

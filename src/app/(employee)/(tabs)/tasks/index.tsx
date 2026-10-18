@@ -86,7 +86,7 @@ function TaskRow({ task, team, mine }: { task: Task; team: boolean; mine: boolea
   const open = () =>
     team && mine
       ? router.push({ pathname: '/team-task', params: { id: String(task.task_id) } })
-      : router.push({ pathname: '/task/[id]', params: { id: String(task.task_id) } });
+      : router.push({ pathname: '/tasks/[id]', params: { id: String(task.task_id) } });
   return (
     <PressableScale
       onPress={open}

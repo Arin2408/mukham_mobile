@@ -27,7 +27,7 @@ export default function ShiftsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
       <ScrollView contentContainerStyle={styles.content}>
         {failed ? (
           <StateView

@@ -67,7 +67,7 @@ export default function DesignationsScreen() {
   const departmentOptions = departments.data.map((d) => ({ id: d.department_id, name: departmentLabel(d, offices.data) }));
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         {adding ? (
         <View style={styles.card}>

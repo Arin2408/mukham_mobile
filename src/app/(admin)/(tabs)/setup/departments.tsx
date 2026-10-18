@@ -22,7 +22,7 @@ export default function DepartmentsScreen() {
   const ready = departments.data && designations.data && offices.data;
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
       <ScrollView contentContainerStyle={styles.content}>
         {failed ? (
           <StateView
