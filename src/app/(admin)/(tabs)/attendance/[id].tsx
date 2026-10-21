@@ -10,7 +10,8 @@ import { ErrorBanner } from '@/components/error-banner';
 import { ListScreenBody } from '@/components/list-screen';
 import { Pill } from '@/components/pill';
 import { StateView } from '@/components/state-view';
-import { daysAgo, dayStatus, formatDay, formatHours, formatTime } from '@/lib/format';
+import { awayPeriods } from '@/features/presence/away-periods';
+import { daysAgo, dayStatus, formatDay, formatDuration, formatHours, formatTime } from '@/lib/format';
 import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 const DAYS = 30;
@@ -130,7 +131,18 @@ function DayRow({ record }: { record: OrgRecord }) {
         {record.source === 'manual' || record.location_status === 'manual' ? (
           <Pill label={t('history.manual')} tone="info" />
         ) : null}
+        {record.presence_tracking === 'off' ? <Pill label={t('presence.trackingOff')} tone="warn" /> : null}
+        {record.time_outside_minutes ? (
+          <Pill label={t('presence.outside', { duration: formatDuration(record.time_outside_minutes) })} tone="warn" />
+        ) : null}
       </View>
+      {awayPeriods(record.presence_events).map((p) => (
+        <Text key={p.from} style={text.muted}>
+          {p.to
+            ? t('presence.away', { from: formatTime(p.from), to: formatTime(p.to) })
+            : t('presence.awayNow', { from: formatTime(p.from) })}
+        </Text>
+      ))}
     </View>
   );
 }

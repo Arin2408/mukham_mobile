@@ -23,6 +23,9 @@ export default function AdminTabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        // Leaving a tab closes what was opened inside it, so coming back to
+        // Setup (or People, Attendance) shows its main list again.
+        popToTopOnBlur: true,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,
         tabBarStyle: { backgroundColor: colors.tabBar, borderTopColor: colors.cardBorder },

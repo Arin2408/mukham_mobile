@@ -203,6 +203,28 @@ describe('one employee', () => {
     alert.mockRestore();
   });
 
+  it('shows the time spent out of the office, and when tracking was off', async () => {
+    mockHistory.mockResolvedValue([
+      record(11, 4, today(9), null, {
+        presence_tracking: 'on',
+        time_outside_minutes: 30,
+        presence_events: [
+          { event: 'exit', at: today(14, 10) },
+          { event: 'enter', at: today(14, 40) },
+          { event: 'exit', at: today(16, 5) },
+        ],
+      }),
+      record(10, 4, '2026-10-01T03:30:00Z', '2026-10-01T12:30:00Z', { presence_tracking: 'off', time_outside_minutes: 0 }),
+    ]);
+
+    await show(<EmployeeAttendanceScreen />);
+
+    expect(await screen.findByText('Outside 30 min')).toBeTruthy();
+    expect(screen.getByText('Out 14:10 – 14:40')).toBeTruthy();
+    expect(screen.getByText('Out since 16:05')).toBeTruthy();
+    expect(screen.getByText('Tracking off')).toBeTruthy();
+  });
+
   it("shows the server's reason when a manual entry is refused", async () => {
     jest.spyOn(Alert, 'alert').mockImplementation((_t, _b, buttons) => buttons?.[1]?.onPress?.());
     mockHistory.mockResolvedValue([]);

@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 
 import { useStackHeader } from '@/components/stack-header';
 import { usePushSetup } from '@/features/notifications/use-push-setup';
+import { usePresenceSync } from '@/features/presence/use-presence-sync';
 import { useTheme } from '@/theme';
 
 /**
@@ -13,6 +14,7 @@ export default function EmployeeLayout() {
   const { colors } = useTheme();
   const header = useStackHeader();
   usePushSetup();
+  usePresenceSync();
 
   return (
     <Stack

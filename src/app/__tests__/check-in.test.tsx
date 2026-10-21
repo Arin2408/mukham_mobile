@@ -58,6 +58,14 @@ jest.mock('@/api/auth', () => ({
   })),
 }));
 
+const mockSyncPresence = jest.fn(async () => {});
+jest.mock('@/features/presence/presence', () => ({ syncPresence: () => mockSyncPresence() }));
+jest.mock('@/features/presence/presence-consent', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { Text } = require('react-native');
+  return { PresenceConsent: () => <Text>Office-area tracking request</Text> };
+});
+
 const mockMark = jest.fn();
 const mockVerify = jest.fn();
 jest.mock('@/api/attendance', () => ({
@@ -82,6 +90,7 @@ beforeEach(() => {
   mockParams.action = 'checkin';
   mockGetPosition.mockReset().mockResolvedValue(AT_OFFICE);
   mockMark.mockReset();
+  mockSyncPresence.mockClear();
   mockVerify.mockReset().mockResolvedValue({ faceToken: 'ft-1', reason: '' });
 });
 
@@ -104,6 +113,9 @@ describe('check-in screen', () => {
     expect(await screen.findByText(/^Checked in at \d\d:\d\d$/)).toBeTruthy();
     expect(screen.getByText('HQ Delhi, 15 m from the office')).toBeTruthy();
     expect(screen.getByText('Live face check passed')).toBeTruthy();
+    // Starts watching the office, and asks for "Allow all the time" if needed.
+    expect(mockSyncPresence).toHaveBeenCalled();
+    expect(screen.getByText('Office-area tracking request')).toBeTruthy();
     expect(mockVerify).toHaveBeenCalledWith('sess-1', '9000000302');
     expect(mockMark).toHaveBeenCalledWith({
       action: 'checkin',
@@ -185,7 +197,7 @@ describe('check-in screen', () => {
     expect(mockGetPosition).toHaveBeenCalledTimes(2);
   });
 
-  it('checks out without a face check and shows the hours worked', async () => {
+  it('checks out after a face check and shows the hours worked', async () => {
     mockParams.action = 'checkout';
     mockMark.mockResolvedValueOnce({
       action: 'checkout',
@@ -201,8 +213,27 @@ describe('check-in screen', () => {
 
     expect(await screen.findByText(/^Checked out at \d\d:\d\d$/)).toBeTruthy();
     expect(screen.getByText('9.1 h worked today')).toBeTruthy();
-    expect(mockVerify).not.toHaveBeenCalled();
-    expect(mockMark).toHaveBeenCalledWith({ action: 'checkout', ...AT_OFFICE, isMocked: false });
+    // Stops watching the office; nothing to ask for after check-out.
+    expect(mockSyncPresence).toHaveBeenCalled();
+    expect(screen.queryByText('Office-area tracking request')).toBeNull();
+    // The same person who checked in checks out.
+    expect(mockVerify).toHaveBeenCalledWith('sess-1', '9000000302');
+    expect(mockMark).toHaveBeenCalledWith({
+      action: 'checkout',
+      ...AT_OFFICE,
+      faceToken: 'ft-1',
+      isMocked: false,
+      deviceId: 'android-test',
+    });
+  });
+
+  it('explains that only their own phone can check in', async () => {
+    mockMark.mockRejectedValueOnce(new ApiError(403, 'device_not_approved', 'This phone is not registered.'));
+
+    await renderScreen();
+
+    expect(await screen.findByText("This phone isn't registered")).toBeTruthy();
+    expect(screen.getByText(/ask your admin to approve it/)).toBeTruthy();
   });
 
   it('closes with Done', async () => {

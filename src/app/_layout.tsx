@@ -1,4 +1,6 @@
 import '@/i18n';
+// Defines the background task Android wakes when the phone leaves or returns to the office.
+import '@/features/presence/presence';
 
 import {
   Archivo_400Regular,

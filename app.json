@@ -58,7 +58,9 @@
         "expo-location",
         {
           "locationWhenInUsePermission": "Mukham checks that you are at your office when you check in or out.",
-          "isAndroidBackgroundLocationEnabled": false,
+          "locationAlwaysAndWhenInUsePermission": "While you are checked in, Mukham notes when you leave and return to the office area.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": false,
           "isIosBackgroundLocationEnabled": false
         }
       ],

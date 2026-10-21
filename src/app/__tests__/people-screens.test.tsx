@@ -37,6 +37,8 @@ const mock = {
   updateTask: jest.fn(),
   deleteTask: jest.fn(),
   setTaskStatus: jest.fn(),
+  approvePhone: jest.fn(),
+  resetPhone: jest.fn(),
 };
 jest.mock('@/api/people', () => ({
   getEmployees: () => mock.getEmployees(),
@@ -46,6 +48,8 @@ jest.mock('@/api/people', () => ({
   deleteEmployee: (id: number) => mock.deleteEmployee(id),
   getHierarchy: () => mock.getHierarchy(),
   setManager: (...a: unknown[]) => mock.setManager(...a),
+  approvePhone: (id: number) => mock.approvePhone(id),
+  resetPhone: (id: number) => mock.resetPhone(id),
 }));
 jest.mock('@/api/setup', () => ({
   getDepartments: async () => [{ department_id: 1, details: 'Sales', location_id: 1 }],
@@ -242,12 +246,39 @@ describe("an employee's page", () => {
     await show(<PersonScreen />);
 
     expect(await screen.findByText('Meena Iyer')).toBeTruthy(); // reports to
+    // The phone lock is off: no phone card.
+    expect(screen.queryByText('Phone for check-in')).toBeNull();
     await fireEvent.press(screen.getByText('Show ID card'));
     expect(mockPush).toHaveBeenCalledWith({ pathname: '/person/card', params: { id: '4' } });
 
     await fireEvent.press(screen.getByText('Remove employee'));
     await waitFor(() => expect(mock.deleteEmployee).toHaveBeenCalledWith(4));
     await waitFor(() => expect(mockBack).toHaveBeenCalled());
+  });
+
+  it("approves a new phone, and can reset the employee's phone", async () => {
+    mockParams.id = '4';
+    mock.getEmployees.mockResolvedValue([person(4, 'Ravi', 'Sharma', { phone_status: 'pending' })]);
+    mock.approvePhone.mockResolvedValue({});
+    mock.resetPhone.mockResolvedValue({});
+    await show(<PersonScreen />);
+
+    expect(await screen.findByText(/A new phone is waiting for approval/)).toBeTruthy();
+    await fireEvent.press(screen.getByText('Approve new phone'));
+    await waitFor(() => expect(mock.approvePhone).toHaveBeenCalledWith(4));
+
+    pressAlertButton('Reset phone');
+    await fireEvent.press(screen.getByText('Reset phone'));
+    await waitFor(() => expect(mock.resetPhone).toHaveBeenCalledWith(4));
+  });
+
+  it('says when no phone is registered yet', async () => {
+    mockParams.id = '4';
+    mock.getEmployees.mockResolvedValue([person(4, 'Ravi', 'Sharma', { phone_status: 'none' })]);
+    await show(<PersonScreen />);
+
+    expect(await screen.findByText(/Their next check-in from the app registers their phone/)).toBeTruthy();
+    expect(screen.queryByText('Reset phone')).toBeNull();
   });
 });
 

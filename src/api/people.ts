@@ -22,6 +22,9 @@ export type Employee = {
   is_member_registered: boolean;
   manager_id: number | null;
   manager_name: string | null;
+  /** The phone they check in from; "pending" = a new phone awaits approval. Null while the phone lock is off. */
+  phone_status?: 'none' | 'registered' | 'pending' | null;
+  phone_registered_at?: string | null;
 };
 
 /** What the add and edit forms send. `manager: null` = reports to the organisation. */
@@ -72,6 +75,16 @@ export function updateEmployee(id: number, input: EmployeeInput) {
 
 export function deleteEmployee(id: number) {
   return api<unknown>(`/employees/${id}`, { method: 'DELETE' });
+}
+
+/** Lets the new phone that tried to check in replace the old one. */
+export function approvePhone(id: number) {
+  return api<Employee>(`/employees/${id}/phone/approve`, { method: 'POST' });
+}
+
+/** Forgets the phone; the next check-in from the app registers one. */
+export function resetPhone(id: number) {
+  return api<Employee>(`/employees/${id}/phone`, { method: 'DELETE' });
 }
 
 export function getHierarchy() {

@@ -6,11 +6,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { mediaUrl } from '@/api/config';
 import { errorMessage } from '@/api/errors';
-import { deleteEmployee, getEmployees } from '@/api/people';
+import { approvePhone, deleteEmployee, getEmployees, resetPhone, type Employee } from '@/api/people';
 import { Avatar } from '@/components/avatar';
 import { Button } from '@/components/button';
 import { ErrorBanner } from '@/components/error-banner';
 import { StateView } from '@/components/state-view';
+import { formatDate, toDateParam } from '@/lib/format';
 import { fonts, makeStyles, radius, spacing, useTheme } from '@/theme';
 
 const shown = (value: string | null | undefined) => (value && value !== 'N/A' ? value : null);
@@ -74,6 +75,7 @@ export default function PersonScreen() {
             </View>
           ))}
         </View>
+        {e.phone_status ? <PhoneCard employee={e} name={name} /> : null}
         <Button label={t('person.edit')} onPress={() => router.push({ pathname: '/person/form', params: { id } })} />
         <Button
           variant="secondary"
@@ -84,6 +86,57 @@ export default function PersonScreen() {
         <ErrorBanner message={remove.isError ? errorMessage(remove.error, t) : null} />
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+/** The phone this employee checks in from, with Approve (new phone) and Reset. */
+function PhoneCard({ employee, name }: { employee: Employee; name: string }) {
+  const styles = useStyles();
+  const { text } = useTheme();
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const status = employee.phone_status ?? 'none';
+
+  const change = useMutation({
+    mutationFn: (kind: 'approve' | 'reset') =>
+      kind === 'approve' ? approvePhone(employee.employee_id) : resetPhone(employee.employee_id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'people'] }),
+  });
+
+  const confirmReset = () =>
+    Alert.alert(t('person.resetPhoneTitle', { name }), t('person.resetPhoneBody'), [
+      { text: t('checkIn.cancel'), style: 'cancel' },
+      { text: t('person.resetPhone'), style: 'destructive', onPress: () => change.mutate('reset') },
+    ]);
+
+  const message =
+    status === 'pending'
+      ? t('person.phonePending')
+      : status === 'registered' && employee.phone_registered_at
+        ? t('person.phoneRegistered', { date: formatDate(toDateParam(new Date(employee.phone_registered_at))) })
+        : t('person.phoneNone');
+
+  return (
+    <View style={styles.card}>
+      <Text style={styles.value}>{t('person.phone')}</Text>
+      <Text style={status === 'pending' ? styles.pending : text.muted}>{message}</Text>
+      {status === 'pending' ? (
+        <Button
+          label={t('person.approvePhone')}
+          onPress={() => change.mutate('approve')}
+          loading={change.isPending && change.variables === 'approve'}
+        />
+      ) : null}
+      {status !== 'none' ? (
+        <Button
+          variant="secondary"
+          label={t('person.resetPhone')}
+          onPress={confirmReset}
+          loading={change.isPending && change.variables === 'reset'}
+        />
+      ) : null}
+      <ErrorBanner message={change.isError ? errorMessage(change.error, t) : null} />
+    </View>
   );
 }
 

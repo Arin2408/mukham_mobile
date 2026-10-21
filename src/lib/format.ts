@@ -147,10 +147,11 @@ export function formatDateShort(value: string): string {
   return formatDay(parseDateParam(value).toISOString());
 }
 
-/** "8 h" or "8 h 30 min" for a duration in minutes. */
+/** "8 h", "8 h 30 min" or "30 min" for a duration in minutes. */
 export function formatDuration(minutes: number): string {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
+  if (!h) return `${m} min`;
   return m ? `${h} h ${m} min` : `${h} h`;
 }
 

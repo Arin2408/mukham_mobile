@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCameraPermissions } from 'expo-camera';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, ZoomIn } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Linking, Text, View } from 'react-native';
@@ -22,6 +22,8 @@ import { easeOut, FadeIn } from '@/components/ui/motion';
 import { CameraPermissionRequest } from '@/features/face/camera-permission';
 import { LivenessDetector, livenessAvailable } from '@/features/face/liveness-detector';
 import { getPosition, PositionError, type Position } from '@/features/location/get-position';
+import { syncPresence } from '@/features/presence/presence';
+import { PresenceConsent } from '@/features/presence/presence-consent';
 import { getDeviceId } from '@/lib/device-id';
 import { formatDistance, formatHours, formatTime } from '@/lib/format';
 import { fonts, makeStyles, spacing, useTheme } from '@/theme';
@@ -71,6 +73,9 @@ export default function CheckInScreen() {
             }),
           };
         }
+        if (error.code === 'device_not_approved') {
+          return { title: t('checkIn.phoneTitle'), body: t('checkIn.phoneBody') };
+        }
         if (error.code === 'face_verification_required') {
           return { title: t('checkIn.faceFailedTitle'), body: t('checkIn.faceFailedBody') };
         }
@@ -90,15 +95,17 @@ export default function CheckInScreen() {
     (result: MarkResult) => {
       // Home and History show the new status at once.
       queryClient.invalidateQueries({ queryKey: ['attendance'] });
+      // Start watching the office after check-in; stop after check-out.
+      syncPresence().catch(() => {});
       setStep({ kind: 'success', result });
     },
     [queryClient],
   );
 
-  // Location first; then check-out is saved straight away, and check-in
-  // opens the live face check. A retry runs everything again.
+  // Location first, then the live face check (for check-in and check-out
+  // alike, so nobody else can do either). A retry runs everything again.
   useEffect(() => {
-    if (action === 'checkin' && (!livenessAvailable || !permission?.granted)) {
+    if (!livenessAvailable || !permission?.granted) {
       return;
     }
     let active = true;
@@ -106,13 +113,6 @@ export default function CheckInScreen() {
     (async () => {
       const position = await getPosition();
       if (!active) return;
-
-      if (action === 'checkout') {
-        setStep({ kind: 'working', label: t('checkIn.saving') });
-        const result = await markAttendance({ action, ...position, isMocked: position.mocked });
-        if (active) finish(result);
-        return;
-      }
 
       setStep({ kind: 'working', label: t('checkIn.starting') });
       const [session, credentials] = await Promise.all([createLivenessSession(), getLivenessCredentials()]);
@@ -130,7 +130,7 @@ export default function CheckInScreen() {
     return () => {
       active = false;
     };
-  }, [action, permission?.granted, attempt, t, finish, failureFor]);
+  }, [permission?.granted, attempt, t, failureFor]);
 
   async function afterFace(sessionId: string, position: Position) {
     setStep({ kind: 'working', label: t('checkIn.verifying') });
@@ -146,7 +146,7 @@ export default function CheckInScreen() {
       }
       setStep({ kind: 'working', label: t('checkIn.saving') });
       const result = await markAttendance({
-        action: 'checkin',
+        action,
         ...position,
         faceToken,
         isMocked: position.mocked,
@@ -170,7 +170,7 @@ export default function CheckInScreen() {
 
   const close = () => router.back();
 
-  if (action === 'checkin' && !livenessAvailable) {
+  if (!livenessAvailable) {
     return (
       <Result
         icon="alert-circle"
@@ -182,7 +182,7 @@ export default function CheckInScreen() {
     );
   }
 
-  if (action === 'checkin' && !permission?.granted) {
+  if (!permission?.granted) {
     return (
       <CameraPermissionRequest
         permission={permission}
@@ -228,6 +228,7 @@ export default function CheckInScreen() {
             : t('checkIn.checkedInTitle', { time: formatTime(r.check_in) })
         }
         lines={lines}
+        extra={checkedOut ? null : <PresenceConsent />}
         primary={{ label: t('checkIn.done'), onPress: close }}
       />
     );
@@ -265,12 +266,14 @@ type ResultProps = {
   tone: 'good' | 'bad';
   title: string;
   lines: string[];
+  /** Shown under the lines, such as the out-of-office tracking request. */
+  extra?: ReactNode;
   primary: { label: string; onPress: () => void };
   secondary?: { label: string; onPress: () => void };
 };
 
 /** The full-screen result: a big icon, what happened, and what to do next. */
-function Result({ icon, tone, title, lines, primary, secondary }: ResultProps) {
+function Result({ icon, tone, title, lines, extra, primary, secondary }: ResultProps) {
   const styles = useStyles();
   const { colors } = useTheme();
   const color = tone === 'good' ? colors.successText : colors.danger;
@@ -294,6 +297,7 @@ function Result({ icon, tone, title, lines, primary, secondary }: ResultProps) {
             <Text style={styles.resultLine}>{line}</Text>
           </FadeIn>
         ))}
+        {extra ? <FadeIn index={4}>{extra}</FadeIn> : null}
       </View>
       <FadeIn index={5} style={styles.actions}>
         <Button label={primary.label} onPress={primary.onPress} />

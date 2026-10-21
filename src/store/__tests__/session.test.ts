@@ -2,7 +2,10 @@ import { signOutOnServer, verifySession } from '@/api/auth';
 import { ApiError } from '@/api/errors';
 import { queryClient } from '@/api/query-client';
 import { tokenStore } from '@/api/tokens';
+import { clearPresence } from '@/features/presence/presence';
 import { useSession } from '@/store/session';
+
+jest.mock('@/features/presence/presence', () => ({ clearPresence: jest.fn(async () => {}) }));
 
 jest.mock('@/api/auth', () => ({
   verifySession: jest.fn(),
@@ -79,6 +82,8 @@ describe('session', () => {
     await useSession.getState().signOut();
 
     expect(signOutOnServer).toHaveBeenCalled();
+    // The phone stops watching the office for the person who signed out.
+    expect(clearPresence).toHaveBeenCalled();
     expect(useSession.getState().status).toBe('signedOut');
     expect(await tokenStore.getRole()).toBeNull();
   });

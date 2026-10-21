@@ -192,6 +192,8 @@
     "outsideBody": "You are {{distance}} from {{office}}. Move closer and try again.",
     "faceFailedTitle": "The face check didn't pass",
     "faceFailedBody": "Hold the phone at eye level, in good light, and try again.",
+    "phoneTitle": "This phone isn't registered",
+    "phoneBody": "You can only check in from your own phone. If you have a new phone, ask your admin to approve it, then try again.",
     "noOpenTitle": "You're not checked in",
     "locationTitle": "Location problem",
     "permissionTitle": "Location access needed",
@@ -286,6 +288,14 @@
     "removeTitle": "Remove {{name}}?",
     "removeBody": "They can no longer sign in. Anyone who reports to them moves up to their manager.",
     "gone": "This employee has been removed.",
+    "phone": "Phone for check-in",
+    "phoneNone": "Not registered yet. Their next check-in from the app registers their phone.",
+    "phoneRegistered": "Registered on {{date}}. Check-in works only from this phone.",
+    "phonePending": "A new phone is waiting for approval. They tried to check in from a phone that is not registered.",
+    "approvePhone": "Approve new phone",
+    "resetPhone": "Reset phone",
+    "resetPhoneTitle": "Reset the phone for {{name}}?",
+    "resetPhoneBody": "Their next check-in from the app will register that phone. Do this when they change phones.",
     "addTitle": "Add employee",
     "editTitle": "Edit employee",
     "firstName": "First name",
@@ -484,5 +494,18 @@
     "employeesHint": "Share the password shown after adding",
     "faces": "Employee registers their face",
     "facesHint": "Done at their first sign-in on the app"
+  },
+  "presence": {
+    "leftTitle": "You left the office area",
+    "leftBody": "If you're done for the day, open Mukham and check out.",
+    "consentTitle": "Note when you leave the office",
+    "consentBody": "While you're checked in, Mukham records when you leave and return to the office area, so your admin sees time spent outside. It stops when you check out. To do this, set location to \"Allow all the time\".",
+    "allow": "Allow all the time",
+    "blocked": "Location \"Allow all the time\" is turned off for Mukham. Turn it on in Settings.",
+    "on": "Office-area tracking is on until you check out.",
+    "outside": "Outside {{duration}}",
+    "trackingOff": "Tracking off",
+    "away": "Out {{from}} – {{to}}",
+    "awayNow": "Out since {{from}}"
   }
 }

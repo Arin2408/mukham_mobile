@@ -34,12 +34,19 @@ export type AttendanceRecord = {
   hours_worked: number | null;
 };
 
+/** One time the phone left (exit) or came back into (enter) the office area. */
+export type PresenceMove = { event: 'exit' | 'enter'; at: string };
+
 /** One attendance record as History shows it. */
 export type HistoryRecord = AttendanceRecord & {
   location_status: string;
   face_status: string;
   source: string;
   check_in_distance: number | null;
+  /** Office-area tracking while checked in: null when the app didn't track this day. */
+  presence_tracking?: 'on' | 'off' | null;
+  time_outside_minutes?: number | null;
+  presence_events?: PresenceMove[];
 };
 
 export type MarkResult = {

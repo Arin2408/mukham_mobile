@@ -5,6 +5,7 @@ import { ApiError } from '@/api/errors';
 import { queryClient } from '@/api/query-client';
 import { tokenStore, type Role } from '@/api/tokens';
 import { unregisterFromPush } from '@/features/notifications/push';
+import { clearPresence } from '@/features/presence/presence';
 
 type Status = 'loading' | 'signedOut' | 'signedIn';
 
@@ -60,14 +61,17 @@ export const useSession = create<SessionState>((set) => ({
   },
 
   async signOut() {
-    // First, while the session still works: this phone gets no more reminders.
+    // First, while the session still works: this phone gets no more
+    // reminders, and stops watching the office (sending what's waiting).
     await unregisterFromPush();
+    await clearPresence();
     await signOutOnServer();
     await tokenStore.clear();
     set(signedOut());
   },
 
   expire() {
+    clearPresence().catch(() => {});
     set(signedOut());
   },
 }));
